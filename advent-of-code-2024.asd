@@ -13,8 +13,11 @@
                :lisp-stat
                :local-time
                :trivia
+               :str
                ;; :fset
 	       )
   :components ((:file "package")
 	       (:file "util")
-	       (:file "day01")))
+	       (:file "day01")
+               ;; AoC 2023 recap
+               (:file "2023/day01")))
