@@ -35,12 +35,8 @@
       sum (score-game game))))
 
 (defun game-power (game)
-  (let ((combined (apply #'append (getf game :sets))))
-    (loop
-      with plist = nil
-      for (key value) on combined by #'cddr
-      do (setf (getf plist key) (max (getf plist key 0) value))
-      finally (return (reduce #'* (alexandria+:plist-values plist))))))
+  (let ((maximized (merge-plists (getf game :sets) :value-selector #'max)))
+    (reduce #'* (alexandria+:plist-values maximized))))
 
 (defun problem-2 (&key (input *input-part-2-test*))
   (loop

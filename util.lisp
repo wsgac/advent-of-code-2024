@@ -46,3 +46,25 @@ coordinates in the form (row, column). Otherwise, return NIL."
   "Parse DATA string into a 2-dimensional list."
   (mapcar (alexandria:rcurry #'coerce 'list)
 			 (split-lines data)))
+
+(defun merge-plists (plists &key
+                              (value-selector #'(lambda (a b) (declare (ignore a)) b))
+                              (value-selector-default 0))
+  "Merge `plists` into a single plist. Optionally use `value-selector`, a
+2-argument function, to select which value will be used in case of key
+collision."
+  (loop
+    with plist = nil
+    for (key val) on (apply #'append plists) by #'cddr
+    do (setf (getf plist key)
+             (funcall value-selector (getf plist key value-selector-default) val))
+    finally (return plist)))
+
+#+(or)
+(merge-plists '((:a 1 :b 2) (:b 20 :c 30)))
+#+(or)
+(merge-plists '((:a 1 :b 20 :c 300) (:a 10 :b 200 :c 3) (:a 100 :b 2 :c 30))
+              :value-selector #'max)
+#+(or)
+(merge-plists '((:a 1 :b 20 :c 300) (:a 10 :b 200 :c 3) (:a 100 :b 2 :c 30))
+              :value-selector #'min :value-selector-default most-positive-fixnum)

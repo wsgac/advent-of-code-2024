@@ -28,7 +28,8 @@
    :join-numbers
    :position-in-2d-array
    :parse-string-into-array
-   :parse-string-into-list))
+   :parse-string-into-list
+   :merge-plists))
 
 (defpackage #:advent-of-code-2024.day01
   (:nicknames #:aoc2024.day01)
