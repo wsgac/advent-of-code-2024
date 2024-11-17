@@ -34,6 +34,19 @@
       for game in (parse-games input)
       sum (score-game game))))
 
+(defun game-power (game)
+  (let ((combined (apply #'append (getf game :sets))))
+    (loop
+      with plist = nil
+      for (key value) on combined by #'cddr
+      do (setf (getf plist key) (max (getf plist key 0) value))
+      finally (return (reduce #'* (alexandria+:plist-values plist))))))
+
+(defun problem-2 (&key (input *input-part-2-test*))
+  (loop
+    for game in (parse-games input)
+    sum (game-power game)))
+
 (defparameter *input-part-1-test*
   "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
