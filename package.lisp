@@ -10,7 +10,7 @@
 (defun apply-local-nicknames (package)
   (let ((pkg (find-package (symbol-name package))))
     (dolist (alias *package-local-nicknames*)
-      (sb-unix::add-package-local-nickname (car alias)
+      (sb-unix::add-package-local-nickname (string-upcase (car alias))
                                            (find-package (string-upcase (cdr alias)))
                                            pkg))))
 

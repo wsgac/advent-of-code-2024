@@ -35,9 +35,15 @@
     finally (return (format nil "[0-9]|~{~r~^|~}" digits))))
 
 (defun get-digits-or-words (input start end)
-  (let ((matches (cl-ppcre:all-matches-as-strings *digit-regex* input :start start :end end)))
+  ;; WSG: This has a problem in that it fails in the case of
+  ;; overlapping matches - only extracts the first one
+  (let ((matches (re:all-matches-as-strings *digit-regex* input :start start :end end)))
     (list (ensure-digit (first matches))
           (ensure-digit (car (last matches))))))
+
+#+(or)
+(get-digits-or-words "35zrgthreetwonesz" 0 nil)
+;; -> (#\3 #\2) instead of (#\3 #\1)
 
 (defun problem-2 (&key (input *input-part-2-test*))
   (loop
