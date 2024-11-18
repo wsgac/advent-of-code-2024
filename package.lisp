@@ -50,3 +50,9 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2023.day02)
+
+(defpackage #:advent-of-code-2023.day03
+  (:nicknames #:aoc2023.day03)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2023.day03)
