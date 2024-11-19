@@ -29,9 +29,13 @@
                                       ((list r c)
                                        (and (< -1 r rows)
                                             (< -1 c cols))))
-                                    wishful-contour)))
-       (notevery (tr:lambda-match 
-                   ((list r c) (eql (aref engine-array r c) #\.))) contour)))))
+                                    wishful-contour))
+            (is-part (notevery (tr:lambda-match 
+                                 ((list r c) (eql (aref engine-array r c) #\.))) contour)))
+       (values is-part
+               (when is-part
+                 (remove-if-not (tr:lambda-match
+                                  ((list r c) (eql (aref engine-array r c) #\*))) contour)))))))
 
 (defun problem-1 (&key (input *input-part-1-test*))
   (let* ((lines (uiop:split-string input :separator '(#\newline)))
@@ -43,6 +47,24 @@
                ((list :left l :right r :row row)
                 (parse-integer (subseq (nth row lines) l r))))))
       (reduce #'+ (mapcar #'coords->number part-coords)))))
+
+(defun problem-2 (&key (input *input-part-2-test*))
+  (let* ((lines (uiop:split-string input :separator '(#\newline)))
+         (engine (parse-input-to-array lines))
+         (coords (get-number-coords lines))
+         (h (make-hash-table :test #'equal)))
+    (loop
+      for coord in coords
+      for number = (tr:let-match (((list :left l :right r :row row) coord))
+                     (parse-integer (nth row lines) :start l :end r))
+      for gears = (nth-value 1 (part-number? coord engine))
+      do (loop
+           for gear in gears
+           do (push number (gethash gear h))))
+    (loop
+      for parts being the hash-values in h
+      if (= 2 (length parts))
+        sum (reduce #'* parts))))
 
 (defparameter *input-part-1-test*
   "467..114..
