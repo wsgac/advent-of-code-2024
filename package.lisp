@@ -29,7 +29,8 @@
    :position-in-2d-array
    :parse-string-into-array
    :parse-string-into-list
-   :merge-plists))
+   :merge-plists
+   :parse-integers))
 
 (defpackage #:advent-of-code-2024.day01
   (:nicknames #:aoc2024.day01)
@@ -56,3 +57,9 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2023.day03)
+
+(defpackage #:advent-of-code-2023.day04
+  (:nicknames #:aoc2023.day04)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2023.day04)

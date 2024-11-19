@@ -68,3 +68,18 @@ collision."
 #+(or)
 (merge-plists '((:a 1 :b 20 :c 300) (:a 10 :b 200 :c 3) (:a 100 :b 2 :c 30))
               :value-selector #'min :value-selector-default most-positive-fixnum)
+
+(defun parse-integers (string)
+  "Assuming that `string` is a string of space-delimited integers, parse
+all of them into a list."
+  (loop
+    for int-string in (uiop:split-string string)
+    for int = (parse-integer int-string :junk-allowed t)
+    when int
+      collect int))
+
+#+(or)
+(parse-integers "0 1 2 3 4 5")
+
+#+(or)
+(parse-integers "0  1  2  3  4  5")
