@@ -32,6 +32,11 @@
    :merge-plists
    :parse-integers))
 
+(defpackage #:advent-of-code-2024.misc
+  (:use #:cl))
+
+(apply-local-nicknames '#:advent-of-code-2024.misc)
+
 (defpackage #:advent-of-code-2024.day01
   (:nicknames #:aoc2024.day01)
   (:use #:cl #:util))

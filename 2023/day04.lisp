@@ -6,7 +6,8 @@
       for row in rows
       for (card winning yours) = (uiop:split-string row :separator '(#\: #\|))
       collect (list :winning (parse-integers winning)
-                    :yours (parse-integers yours)))))
+                    :yours (parse-integers yours)
+                    :multiple 1))))
 
 (defun problem-1 (&key (input *input-part-1-test*))
   (loop
@@ -14,6 +15,15 @@
     for overlap = (intersection (getf card :winning) (getf card :yours))
     when overlap
       sum (expt 2 (1- (length overlap)))))
+
+(defun problem-2 (&key (input *input-part-2-test*))
+  (loop
+    for (item . rest) on (parse-input input)
+    for item-multiple = (getf item :multiple)
+    for overlap = (length (intersection (getf item :winning) (getf item :yours)))
+    do (mapcar (lambda (c) (incf (getf c :multiple) item-multiple))
+               (subseq rest 0 (min overlap (length rest))))
+    sum (getf item :multiple)))
 
 (defparameter *input-part-1-test*
   "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53

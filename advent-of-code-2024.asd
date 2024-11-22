@@ -18,6 +18,7 @@
 	       )
   :components ((:file "package")
 	       (:file "util")
+               (:file "misc")
 	       (:file "day01")
                ;; AoC 2023 recap
                (:file "2023/day01")))
