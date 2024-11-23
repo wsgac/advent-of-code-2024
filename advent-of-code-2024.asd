@@ -21,4 +21,8 @@
                (:file "misc")
 	       (:file "day01")
                ;; AoC 2023 recap
-               (:file "2023/day01")))
+               (:file "2023/day01")
+               (:file "2023/day02")
+               (:file "2023/day03")
+               (:file "2023/day04")
+               (:file "2023/day05")))
