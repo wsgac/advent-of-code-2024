@@ -7,10 +7,18 @@
 (defun map-to-mapper (map-params)
   (lambda (input)
     (loop
-      for (dest src range) in (parse-map map-params)
+      for (dest src range) in (sort (parse-map map-params) #'< :key #'second)
       when (<= src input (+ src range -1))
         do (return (+ dest (- input src)))
       finally (return input))))
+
+(defun ranges-to-translator (ranges)
+  (lambda (x)
+    `(cond
+       ,@(loop
+	   for (dst src n) in (parse-map ranges)
+	   collect `((<= ,src ,x ,(+ src n)) (+ ,dst (- ,x ,src))))
+       (t x))))
 
 (defun parse-seeds (seed-str)
   (loop
@@ -36,6 +44,21 @@
                                 (funcall mapper item))
                               mappers :initial-value seed)
        minimize location))))
+
+;; TODO Painfully slow! Do something about it, maybe?
+(defun problem-2 (&key (input *input-part-2-test*))
+  (tr:match (parse-input input)
+    ((list :seeds seeds :mappers mappers)
+     (loop
+       for (range-start range-len) on seeds by #'cddr
+       do (format t "Processing range starting at ~a~%" range-start)
+       minimize (loop
+                  for seed from range-start below (+ range-start range-len)
+                  ;; for location = (reduce (lambda (item mapper)
+                  ;;                          (funcall mapper item))
+                  ;;                        mappers :initial-value seed)
+                  for location = (funcall (apply #'a:compose (reverse mappers)) seed)
+                  minimize location)))))
 
 (defparameter *input-part-1-test*
   "seeds: 79 14 55 13

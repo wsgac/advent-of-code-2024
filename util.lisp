@@ -19,6 +19,10 @@
   (* x x))
 (setf (fdefinition '^2) #'square)
 
+(defun cube (x)
+  (* x x x))
+(setf (fdefinition '^3) #'cube)
+
 (defun join-numbers (a b)
   "Combine numbers A and B by juxtaposition."
   (+ (* a (expt 10 (ceiling (log b 10)))) b))

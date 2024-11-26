@@ -25,6 +25,8 @@
    :split-lines
    :square
    :^2
+   :cube
+   :^3
    :join-numbers
    :position-in-2d-array
    :parse-string-into-array
