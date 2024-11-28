@@ -1,7 +1,7 @@
 ;;;; advent-of-code-2024.asd
 
 (asdf:defsystem #:advent-of-code-2024
-  :description "Describe advent-of-code-2024 here"
+  :description "Advent of Code 2024 solutions"
   :author "Wojciech S. Gac <wojciech.s.gac@gmail.com>"
   :license  "Specify license here"
   :version "0.0.1"
@@ -19,10 +19,16 @@
   :components ((:file "package")
 	       (:file "util")
                (:file "misc")
-	       (:file "day01")
                ;; AoC 2023 recap
-               (:file "2023/day01")
-               (:file "2023/day02")
-               (:file "2023/day03")
-               (:file "2023/day04")
-               (:file "2023/day05")))
+               (:module "2023"
+                :components
+                ((:file "day01")
+                 (:file "day02")
+                 (:file "day03")
+                 (:file "day04")
+                 (:file "day05")
+                 (:file "day06")))
+               ;; AoC 2024
+               (:module "2024"
+                :components
+                ((:file "day01")))))

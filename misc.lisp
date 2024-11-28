@@ -1,8 +1,10 @@
 (in-package :advent-of-code-2024.misc)
 
+#+(or)
 (define-condition alert ()
   ())
 
+#+(or)
 (handler-case
     (handler-case
         (handler-case
