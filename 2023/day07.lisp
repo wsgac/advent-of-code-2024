@@ -33,16 +33,17 @@
       ((= 4 (hash-table-count h)) :one-pair 1)
       (t :high-card 0))))
 
-(defun hand< (a b)
-  (flet ((hand->hex (hand)
-           (map 'string (lambda (c) (digit-char (card->value c) 16)) hand)))
- (let ((a-type (hand->type a))
-       (b-type (hand->type b)))
-   (if (= a-type b-type)
-       ;; Need to compare cards
-       (string< (hand->hex a) (hand->hex b))
-       ;; Just compare types
-       (< a-type b-type)))))
+(defun make-hand< (&key (cv #'card->value) (ht #'hand->type))
+    (lambda (a b)
+     (flet ((hand->hex (hand)
+              (map 'string (lambda (c) (digit-char (funcall cv c) 16)) hand)))
+       (let ((a-type (funcall ht a))
+             (b-type (funcall ht b)))
+         (if (= a-type b-type)
+             ;; Need to compare cards
+             (string< (hand->hex a) (hand->hex b))
+             ;; Just compare types
+             (< a-type b-type))))))
 #+(or)
 (hand< "33332" "2AAAA")
 #+(or)
@@ -55,7 +56,59 @@
     collect (list hand (parse-integer bid))))
 
 (defun problem-1 (&key (input *input-part-1-test*))
-  (let ((sorted-input (sort (parse-input input) #'hand< :key #'car)))
+  (let ((sorted-input (sort (parse-input input) (make-hand<) :key #'car)))
+    (loop
+      for i from 1
+      for (hand bid) in sorted-input
+      sum (* i bid))))
+
+(defmethod card->value-2 ((card character))
+  (cond
+    ((digit-char-p card)
+     (- (char-code card) (char-code #\0)))
+    (t
+     (case card
+       (#\T 10)
+       (#\J 0)
+       (#\Q 12)
+       (#\K 13)
+       (#\A 14)))))
+
+(defun hand->type-2 (hand)
+  (flet ((number-and-card> (a b)
+           (if (= (cdr a) (cdr b))
+               (> (card->value-2 (car a)) (card->value-2(car b)))
+               (> (cdr a) (cdr b)))))
+   (let* ((h (util:histogram (coerce hand 'list)))
+          (j (gethash #\J h 0)))
+     (when (and (plusp j) (> (hash-table-count h) 1))
+       (remhash #\J h)
+       (let* ((alist (sort (a:hash-table-alist h) #'number-and-card>)))
+         (incf (gethash (caar alist) h) j)))
+     (cond
+       ;; All cards of the same type - :five-of-a-kind
+       ((= 1 (hash-table-count h)) :five-of-a-kind 6)
+       ;; Two card types, one counts 4 - :four-of-a-kind
+       ((and (= 2 (hash-table-count h))
+             (some (a:curry #'= 4) (a:hash-table-values h)))
+        :four-of-a-kind 5)
+       ;; Two card types - only other possibility is :full-house
+       ((= 2 (hash-table-count h)) :full-house 4)
+       ;; Three card types - one counts 3 - :three-of-a-kind
+       ((and (= 3 (hash-table-count h))
+             (some (a:curry #'= 3) (a:hash-table-values h)))
+        :three-of-a-kind 3)
+       ;; Three distinct types, two must be pairs - :two-pair
+       ((= 3 (hash-table-count h)) :two-pair 2)
+       ;; Four distinct types, one must be a pair - :one-pair
+       ((= 4 (hash-table-count h)) :one-pair 1)
+       (t :high-card 0)))))
+
+(defun problem-2 (&key (input *input-part-1-test*))
+  (let ((sorted-input (sort (parse-input input)
+                            (make-hand< :cv #'card->value-2
+                                        :ht #'hand->type-2)
+                            :key #'car)))
     (loop
       for i from 1
       for (hand bid) in sorted-input
