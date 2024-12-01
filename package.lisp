@@ -82,3 +82,9 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2023.day06)
+
+(defpackage #:advent-of-code-2023.day07
+  (:nicknames #:aoc2023.day07)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2023.day07)

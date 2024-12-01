@@ -27,7 +27,8 @@
                  (:file "day03")
                  (:file "day04")
                  (:file "day05")
-                 (:file "day06")))
+                 (:file "day06")
+                 (:file "day07")))
                ;; AoC 2024
                (:module "2024"
                 :components
