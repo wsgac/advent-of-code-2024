@@ -63,6 +63,12 @@
 
 (apply-local-nicknames '#:advent-of-code-2024.day04)
 
+(defpackage #:advent-of-code-2024.day05
+  (:nicknames #:aoc2024.day05)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day05)
+
 ;; AoC 2023 recap - renewed attempts at solving some problems from 2023
 
 (defpackage #:advent-of-code-2023.day01
