@@ -11,9 +11,7 @@
           (mapcar #'cons (rest numbers) operators)
           :initial-value (first numbers)))
 
-
-(defun || (a b)
-  (+ (* a (expt 10 (ceiling (log (1+ b) 10)))) b))
+(setf (fdefinition '||) #'util:concat-numbers)
 
 (defun operator-lists (n &key with-concat)
   (util:choose-combinations-replacing

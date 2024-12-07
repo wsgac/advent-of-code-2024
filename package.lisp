@@ -33,7 +33,8 @@
    :parse-string-into-list
    :merge-plists
    :parse-integers
-   :choose-combinations-replacing))
+   :choose-combinations-replacing
+   :concat-numbers))
 
 (defpackage #:advent-of-code-2024.misc
   (:use #:cl))

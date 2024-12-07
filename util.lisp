@@ -101,3 +101,7 @@ all of them into a list."
                                             (list (list s))))
                                       set)))))
     (choose-tail set k nil)))
+
+(defun concat-numbers (a b)
+  (if (zerop b) (* 10 a)
+      (+ (* a (expt 10 (floor (1+ (log b 10))))) b)))
