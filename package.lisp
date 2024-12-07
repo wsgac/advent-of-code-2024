@@ -32,7 +32,8 @@
    :parse-string-into-array
    :parse-string-into-list
    :merge-plists
-   :parse-integers))
+   :parse-integers
+   :choose-combinations-replacing))
 
 (defpackage #:advent-of-code-2024.misc
   (:use #:cl))
@@ -68,6 +69,18 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2024.day05)
+
+(defpackage #:advent-of-code-2024.day06
+  (:nicknames #:aoc2024.day06)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day06)
+
+(defpackage #:advent-of-code-2024.day07
+  (:nicknames #:aoc2024.day07)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day07)
 
 ;; AoC 2023 recap - renewed attempts at solving some problems from 2023
 

@@ -87,3 +87,17 @@ all of them into a list."
 
 #+(or)
 (parse-integers "0  1  2  3  4  5")
+
+(defun choose-combinations-replacing (set k)
+  (labels ((choose-tail (set k acc)
+             (if (zerop k)
+                 acc
+                 (choose-tail set (1- k)
+                              (mapcan (lambda (s)
+                                        (if acc
+                                            (mapcar (lambda (l)
+                                                      (cons s l))
+                                                    acc)
+                                            (list (list s))))
+                                      set)))))
+    (choose-tail set k nil)))
