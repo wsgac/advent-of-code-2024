@@ -1,4 +1,4 @@
-;;;; advent-of-code-2024.asd
+;;; advent-of-code-2024.asd
 
 (asdf:defsystem #:advent-of-code-2024
   :description "Advent of Code 2024 solutions"
@@ -41,4 +41,5 @@
                  (:file "day06")
                  (:file "day07")
                  (:file "day08")
-                 (:file "day09")))))
+                 (:file "day09")
+                 (:file "day10")))))

@@ -35,7 +35,8 @@
    :parse-integers
    :choose-combinations-replacing
    :concat-numbers
-   :number->digits))
+   :number->digits
+   :char-arr->num-arr))
 
 (defpackage #:advent-of-code-2024.misc
   (:use #:cl))
@@ -95,6 +96,12 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2024.day09)
+
+(defpackage #:advent-of-code-2024.day10
+  (:nicknames #:aoc2024.day10)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day10)
 
 ;; AoC 2023 recap - renewed attempts at solving some problems from 2023
 

@@ -122,3 +122,15 @@ all of them into a list."
                      (truncate n 10)
                    (n->d n (cons r acc))))))
     (n->d n nil)))
+
+(defun char-arr->num-arr (arr)
+  (let ((arr2 (make-array (array-dimensions arr)))
+        (rows (array-dimension arr 0))
+        (cols (array-dimension arr 1)))
+    (loop
+      for row from 0 below rows
+      do (loop
+           for col from 0 below cols
+           do (setf (aref arr2 row col)
+                    (digit-char-p (aref arr row col)))))
+    arr2))
