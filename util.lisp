@@ -105,3 +105,20 @@ all of them into a list."
 (defun concat-numbers (a b)
   (if (zerop b) (* 10 a)
       (+ (* a (expt 10 (floor (1+ (log b 10))))) b)))
+
+;; (defun number->digits (n)
+;;   (loop
+;;     for (nn r) = (multiple-value-list (truncate n 10))
+;;       then (multiple-value-list (truncate nn 10))
+;;     collect r into digits
+;;     while (plusp nn)
+;;     finally (return (or (nreverse digits) '(0)))))
+
+(defun number->digits (n)
+  (labels ((n->d (n acc)
+             (if (zerop n)
+                 (or acc '(0))
+                 (multiple-value-bind (n r)
+                     (truncate n 10)
+                   (n->d n (cons r acc))))))
+    (n->d n nil)))
