@@ -72,6 +72,8 @@ collision."
 #+(or)
 (merge-plists '((:a 1 :b 20 :c 300) (:a 10 :b 200 :c 3) (:a 100 :b 2 :c 30))
               :value-selector #'min :value-selector-default most-positive-fixnum)
+#+(or)
+(merge-plists '((:a 1 :b 2) (:b 20 :c 30)) :value-selector #'+)
 
 (defun parse-integers (string &key (sep '(#\space #\tab)))
   "Assuming that `string` is a string of space-delimited integers, parse
