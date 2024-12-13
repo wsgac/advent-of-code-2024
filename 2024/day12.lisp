@@ -3,19 +3,6 @@
 (defun parse-input (input)
   (util:parse-string-into-array input))
 
-
-(defparameter *input-part-1-test*
-  "RRRRIICCFF
-RRRRIICCCF
-VVRRRCCFFF
-VVRCCCJFFF
-VVVVCJJCFE
-VVIVCCJJEE
-VVIIICJJEE
-MIIIIIJJEE
-MIIISIJEEE
-MMMISSJEEE")
-
 (defparameter *deltas* '((-1 0) (0 1) (1 0) (0 -1)))
 
 (defun perimeter-contribution (arr row col)
@@ -63,11 +50,43 @@ MMMISSJEEE")
     sum (perimeter-contribution arr r c) into perimeter
     finally (return (* area perimeter))))
 
+(defun sides (h)
+  (+ (hash-table-count h)
+     (loop
+       for v being the hash-values of h
+       sum (loop
+             for (x y) on (sort v #'<)
+             when (and y (> (- y x) 1))
+               sum 1))))
+
+(defun group-cost-2 (arr group)
+  (loop
+    with hr = (make-hash-table)
+    with hc = (make-hash-table)
+    for (r c) in group
+    for ch = (aref arr r c)
+    count 1 into area
+    unless (ignore-errors (char= ch (aref arr (1- r) c)))
+      do (push c (gethash (1- r) hr))
+    unless (ignore-errors (char= ch (aref arr (1+ r) c)))
+      do (push c (gethash r hr))
+    unless (ignore-errors (char= ch (aref arr r (1- c))))
+      do (push r (gethash (1- c) hc))
+    unless (ignore-errors (char= ch (aref arr r (1+ c))))
+      do (push r (gethash c hc))
+    finally (return (* area (+ (sides hr) (sides hc))))))
+
 (defun problem-1 (&key (input *input-part-1-test*))
   (loop
     with arr = (parse-input input)
     for g in (find-groups arr)
     sum (group-cost arr g)))
+
+(defun problem-2 (&key (input *input-part-1-test*))
+  (loop
+    with arr = (parse-input input)
+    for g in (find-groups arr)
+    sum (group-cost-2 arr g)))
 
 #+(or)
 (defun problem-1 (&key (input *input-part-1-test*))
@@ -88,7 +107,17 @@ MMMISSJEEE")
               do (setf (gethash spot h) merged)))
     finally (return (remove-duplicates (a:hash-table-values h) :test #'equal))))
 
-()
+(defparameter *input-part-1-test*
+  "RRRRIICCFF
+RRRRIICCCF
+VVRRRCCFFF
+VVRCCCJFFF
+VVVVCJJCFE
+VVIVCCJJEE
+VVIIICJJEE
+MIIIIIJJEE
+MIIISIJEEE
+MMMISSJEEE")
 
 (defparameter *input-part-2-test*
   "AAAA
