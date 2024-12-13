@@ -30,18 +30,30 @@
     sum (minimum-cost machine)))
 
 (defun minimum-cost-2 (machine)
+  "Try to find values of a and b by solving the simultaneous equations
+and checking if solutions are integers:
+ Γ a*ax + b*bx = px
+ L a*ay + b*by = py
+---
+ Γ a*ax + b*bx = px // *by
+-L a*ay + b*by = py // *bx
+-> a = (px*by - py*bx)/(ax*by - ay*bx)
+
+ Γ a*ax + b*bx = px // *ay
+-L a*ay + b*by = py // *ax
+-> b = (px*ay - py*ax)/(bx*ay - by*ax)
+"
   (tr:match machine
     ((list :prize (list px py)
            :a (list ax ay)
            :b (list bx by))
      (let* ((px (+ px 10000000000000))
             (py (+ py 10000000000000))
-            (a (truncate (- (* px by) (* py bx))
-                         (- (* by ax) (* bx ay))))
-            (b (truncate (- (* px ay) (* py ax))
-                         (- (* ay bx) (* by ax)))))
-       (if (and (= px (+ (* a ax) (* b bx)))
-                (= py (+ (* a ay) (* b by))))
+            (a (/ (- (* px by) (* py bx))
+                  (- (* by ax) (* bx ay))))
+            (b (/ (- (* px ay) (* py ax))
+                  (- (* ay bx) (* by ax)))))
+       (if (and (integerp a) (integerp b))
            (+ (* 3 a) b)
            0)))))
 
