@@ -75,14 +75,17 @@ collision."
 #+(or)
 (merge-plists '((:a 1 :b 2) (:b 20 :c 30)) :value-selector #'+)
 
-(defun parse-integers (string &key (sep '(#\space #\tab)))
+(defun parse-integers (string &key
+                                (sep '(#\space #\tab)))
   "Assuming that `string` is a string of space-delimited integers, parse
 all of them into a list."
+  (declare (ignorable sep))
   (loop
-    for int-string in (uiop:split-string string :separator sep)
-    for int = (parse-integer int-string :junk-allowed t)
-    when int
-      collect int))
+    for s = 0 then offset
+    for (n offset) = (multiple-value-list
+                      (parse-integer string :junk-allowed t :start s))
+    while n
+    collect n))
 
 #+(or)
 (parse-integers "0 1 2 3 4 5")
@@ -136,3 +139,7 @@ all of them into a list."
            do (setf (aref arr2 row col)
                     (digit-char-p (aref arr row col)))))
     arr2))
+
+(defun extract-integers (string)
+  (mapcar #'parse-integer
+          (ppcre:all-matches-as-strings "-?[0-9]+" string)))
