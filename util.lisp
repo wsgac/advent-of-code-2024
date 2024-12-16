@@ -143,3 +143,54 @@ all of them into a list."
 (defun extract-integers (string)
   (mapcar #'parse-integer
           (ppcre:all-matches-as-strings "-?[0-9]+" string)))
+
+(defun %array-loop (array dim indices item body)
+  `(loop
+     for ,(nth dim indices) from 0 below (array-dimension ,array ,dim)
+     ,@(if (= dim (1- (length indices)))
+           `(for ,item = (aref ,array ,@indices)
+                 do (progn ,@body))
+           `(do ,(%array-loop array (1+ dim) indices item body)))))
+
+(defmacro array-loop ((array (&rest indices) &key item) &body body)
+  `(a:with-gensyms ,(list* item indices)
+     ,(%array-loop array 0 indices item `,body)))
+
+
+
+;; (array-loop (arr (r c) :item el)
+;;   (format t "Row: ~a Col: ~a Item: ~a~%" r c el))
+
+;; Priority Queue
+
+(defclass priority-queue ()
+  ((queue
+    :initarg :list
+    :initform nil
+    :accessor queue)
+   (sorted
+    :initform nil
+    :accessor sorted)
+   (cmp
+    :initarg :cmp
+    :accessor cmp)
+   (key
+    :initarg :key
+    :accessor key)))
+
+(defmethod pq-push ((pq priority-queue) item)
+  (prog1 (push item (queue pq))
+    (setf (sorted pq) nil)))
+
+(defmethod pq-pop ((pq priority-queue))
+  (with-slots (queue cmp key sorted) pq
+    (unless sorted
+      (setf queue (sort queue cmp :key key)
+            sorted t))
+    (pop queue)))
+
+(defmethod pq-empty? ((pq priority-queue))
+  (endp (list pq)))
+
+(defun vec+ (v1 v2)
+  (mapcar #'+ v1 v2))

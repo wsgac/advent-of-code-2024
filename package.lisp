@@ -37,7 +37,14 @@
    :concat-numbers
    :number->digits
    :char-arr->num-arr
-   :extract-integers))
+   :extract-integers
+   :array-loop
+   :vec+
+   ;; Priority Queue
+   :priority-queue
+   :pq-push
+   :pq-pop
+   :pq-empty?))
 
 (defpackage #:advent-of-code-2024.misc
   (:use #:cl))
@@ -127,6 +134,18 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2024.day14)
+
+(defpackage #:advent-of-code-2024.day15
+  (:nicknames #:aoc2024.day15)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day15)
+
+(defpackage #:advent-of-code-2024.day16
+  (:nicknames #:aoc2024.day16)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day16)
 
 ;; AoC 2023 recap - renewed attempts at solving some problems from 2023
 
