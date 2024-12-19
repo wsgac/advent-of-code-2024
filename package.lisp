@@ -147,6 +147,24 @@
 
 (apply-local-nicknames '#:advent-of-code-2024.day16)
 
+(defpackage #:advent-of-code-2024.day17
+  (:nicknames #:aoc2024.day17)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day17)
+
+(defpackage #:advent-of-code-2024.day18
+  (:nicknames #:aoc2024.day18)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day18)
+
+(defpackage #:advent-of-code-2024.day19
+  (:nicknames #:aoc2024.day19)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day19)
+
 ;; AoC 2023 recap - renewed attempts at solving some problems from 2023
 
 (defpackage #:advent-of-code-2023.day01
