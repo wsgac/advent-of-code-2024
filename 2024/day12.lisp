@@ -5,7 +5,11 @@
 
 (defparameter *deltas* '((-1 0) (0 1) (1 0) (0 -1)))
 
+(defparameter *diag-deltas* '((1 1) (-1 -1) (1 -1) (-1 1)))
+
 (defun perimeter-contribution (arr row col)
+  "Given an array `arr` and `row` and `col`, return a list of neighboring
+fields of a different kind than the given one."
   (loop
     with ch = (aref arr row col)
     for (dr dc) in *deltas*
@@ -50,6 +54,7 @@
     sum (perimeter-contribution arr r c) into perimeter
     finally (return (* area perimeter))))
 
+#+(or)
 (defun sides (h)
   (+ (hash-table-count h)
      (loop
@@ -59,6 +64,34 @@
              when (and y (> (- y x) 1))
                sum 1))))
 
+(defun corner? (arr r c dr dc)
+  (let ((ch (aref arr r c)))
+    (or
+     ;; convex
+     (not (or (ignore-errors (char= ch (aref arr r (+ c dc))))
+              (ignore-errors (char= ch (aref arr (+ r dr) c)))))
+     ;; concave
+     (ignore-errors
+      (and (char/= ch (aref arr (+ r dr) (+ c dc)))
+           (char= ch (aref arr r (+ c dc)))
+           (char= ch (aref arr (+ r dr) c)))))))
+
+(defun point-corners (arr r c)
+  (loop
+    for (dr dc) in *diag-deltas*
+    count (corner? arr r c dr dc)))
+
+(defun corners (arr group)
+  (loop
+    for (r c) in group
+    sum (point-corners arr r c)))
+
+(defun group-cost-2 (arr group)
+  (let ((area (length group))
+        (sides (corners arr group)))
+    (* area sides)))
+
+#+(or)
 (defun group-cost-2 (arr group)
   (loop
     with hr = (make-hash-table)
@@ -67,14 +100,22 @@
     for ch = (aref arr r c)
     count 1 into area
     unless (ignore-errors (char= ch (aref arr (1- r) c)))
-      do (push c (gethash (1- r) hr))
-    unless (ignore-errors (char= ch (aref arr (1+ r) c)))
       do (push c (gethash r hr))
+    unless (ignore-errors (char= ch (aref arr (1+ r) c)))
+      do (push c (gethash (1+ r) hr))
     unless (ignore-errors (char= ch (aref arr r (1- c))))
-      do (push r (gethash (1- c) hc))
-    unless (ignore-errors (char= ch (aref arr r (1+ c))))
       do (push r (gethash c hc))
-    finally (return (* area (+ (sides hr) (sides hc))))))
+    unless (ignore-errors (char= ch (aref arr r (1+ c))))
+      do (push r (gethash (1+ c) hc))
+    finally (return (* area (+ (sides hr) (sides hc))))
+    ;; finally (return (list :char ch :area area :sides (+ (sides hr)
+    ;;                                                     (sides hc))))
+    ))
+
+(defun plist< (p1 p2)
+  (if (= (getf p1 :area) (getf p2 :area))
+      (< (getf p1 :sides) (getf p2 :sides))
+      (< (getf p1 :area) (getf p2 :area))))
 
 (defun problem-1 (&key (input *input-part-1-test*))
   (loop
@@ -88,24 +129,6 @@
     for g in (find-groups arr)
     sum (group-cost-2 arr g)))
 
-#+(or)
-(defun problem-1 (&key (input *input-part-1-test*))
-  (loop
-    with h = (make-hash-table :test #'equal)
-    with arr = (parse-input input)
-    for row from 0 below (array-dimension arr 0)
-    do (loop
-         for col from 0 below (array-dimension arr 1)
-         for neighbors = (get-neighbors arr row col)
-         for distinct-plists = (get-distinct-plists h neighbors)
-         for merged = (util:merge-plists (cons `(:a 1 :p ,(perimeter-contribution arr row col)) distinct-plists)
-                                         :value-selector #'+)
-         do (format t "(~a,~a) -> ~a~%neighbors: ~a~%distinct: ~a~%merged: ~a~%~%"
-                    row col (aref arr row col) neighbors distinct-plists merged)
-         do (loop
-              for spot in (cons (list row col) neighbors)
-              do (setf (gethash spot h) merged)))
-    finally (return (remove-duplicates (a:hash-table-values h) :test #'equal))))
 
 (defparameter *input-part-1-test*
   "RRRRIICCFF
