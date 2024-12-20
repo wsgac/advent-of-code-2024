@@ -40,11 +40,12 @@ coordinates in the form (row, column). Otherwise, return NIL."
 
 (defun parse-string-into-array (data &key adjustable)
   "Parse DATA string into a 2-dimensional array."
-  (let ((char-array (mapcar (alexandria:rcurry #'coerce 'list)
+  (let ((char-list (mapcar (alexandria:rcurry #'coerce 'list)
+                                        ; (lambda (line) (coerce line 'list))
 			    (split-lines data))))
-    (make-array (list (length char-array) (length (first char-array)))
+    (make-array (list (length char-list) (length (first char-list)))
 		:adjustable adjustable
-		:initial-contents char-array)))
+		:initial-contents char-list)))
 
 (defun parse-string-into-list (data)
   "Parse DATA string into a 2-dimensional list."
@@ -152,10 +153,13 @@ all of them into a list."
                  do (progn ,@body))
            `(do ,(%array-loop array (1+ dim) indices item body)))))
 
-(defmacro array-loop ((array (&rest indices) &key item) &body body)
-  `(a:with-gensyms ,(list* item indices)
-     ,(%array-loop array 0 indices item `,body)))
-
+(defmacro array-loop ((array (&rest indices) &key (item nil itemp)) &body body)
+  (a:once-only (array)
+    `(progn
+       (assert (= (array-rank ,array) ,(length indices))
+               () "ARRAY-LOOP: array rank: ~d variables provided: ~d"
+               (array-rank ,array) ,(length indices))
+       ,(%array-loop array 0 indices (if itemp item (gensym)) body))))
 
 
 ;; (array-loop (arr (r c) :item el)

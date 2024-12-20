@@ -39,7 +39,7 @@
      h)))
 
 (defun problem-1 (&key (input *input-part-1-test*))
-  (multiple-value-bind (arr start end)
+  (multiple-value-bind (arr start)
       (parse-input input)
     (let ((d (find-distances arr start)))
       (loop
@@ -54,7 +54,7 @@
                              100)))))))
 
 (defun problem-2 (&key (input *input-part-1-test*))
-  (multiple-value-bind (arr start end)
+  (multiple-value-bind (arr start)
       (parse-input input)
     (let ((d (find-distances arr start)))
       (loop
