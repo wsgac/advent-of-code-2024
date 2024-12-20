@@ -194,3 +194,7 @@ all of them into a list."
 
 (defun vec+ (v1 v2)
   (mapcar #'+ v1 v2))
+
+(defun manhattan (p1 p2)
+  "Manhattan metric between `p1` and `p2`."
+  (reduce #'+ (mapcar (lambda (a b) (abs (- a b))) p1 p2)))

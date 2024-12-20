@@ -25,9 +25,6 @@
       when (and item (char/= #\# item))
         collect (list (+ row dr) (+ col dc)))))
 
-(defun manhattan (p1 p2)
-  (reduce #'+ (mapcar (lambda (a b) (abs (- a b))) p1 p2)))
-
 (defun a* (arr start end)
   (let* ((pq (make-instance 'util:priority-queue
                             :cmp #'< :key #'car

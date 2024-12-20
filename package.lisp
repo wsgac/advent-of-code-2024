@@ -5,7 +5,8 @@
     ("lt" . "local-time")
     ("tr" . "trivia")
     ("ana" . "anaphora")
-    ("re" . "cl-ppcre")))
+    ("re" . "cl-ppcre")
+    ("s" . "serapeum")))
 
 (defun apply-local-nicknames (package)
   (let ((pkg (find-package (symbol-name package))))
@@ -40,6 +41,7 @@
    :extract-integers
    :array-loop
    :vec+
+   :manhattan
    ;; Priority Queue
    :priority-queue
    :pq-push
@@ -164,6 +166,12 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2024.day19)
+
+(defpackage #:advent-of-code-2024.day20
+  (:nicknames #:aoc2024.day20)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day20)
 
 ;; AoC 2023 recap - renewed attempts at solving some problems from 2023
 

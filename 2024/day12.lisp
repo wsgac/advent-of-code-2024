@@ -23,14 +23,6 @@ fields of a different kind than the given one."
     if (ignore-errors (char= ch (aref arr (+ row dr) (+ col dc))))
       collect (list (+ row dr) (+ col dc))))
 
-(defun get-distinct-plists (h neighbors)
-  (loop
-    for neighbor in neighbors
-    for plist = (gethash neighbor h)
-    if plist
-      collect plist into plists
-    finally (return (remove-duplicates plists :test #'equal))))
-
 (defun find-groups (arr)
   (loop
     with groups = nil
