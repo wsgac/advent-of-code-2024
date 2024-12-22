@@ -4,11 +4,16 @@
 (defun parse-input (input)
   (mapcar #'parse-integer (util:split-lines input)))
 
-(defun evolve (secret)
-  (let* ((s1 (prune (mix secret (ash secret 6))))
-         (s2 (prune (mix s1 (ash s1 -5))))
-         (s3 (prune (mix s2 (ash s2 11)))))
-    s3))
+(let ((evolve-hash (make-hash-table)))
+  (defun evolve (secret)
+    (let ((maybe (gethash secret evolve-hash)))
+      (if maybe
+          maybe
+          (setf (gethash secret evolve-hash)
+           (let* ((s1 (prune (mix secret (ash secret 6))))
+                  (s2 (prune (mix s1 (ash s1 -5))))
+                  (s3 (prune (mix s2 (ash s2 11)))))
+             s3))))))
 
 (defun secret-2000 (secret)
   (loop
@@ -46,22 +51,21 @@
                          collect (mod s 10))
                        'vector))
          (changes (loop
-                    for i from 0 below 2000
-                    collect (- (aref ones (1+ i)) (aref ones i))))
+                    for i from 1 to 2000
+                    collect (- (aref ones i) (aref ones (1- i)))))
          (h (make-hash-table :test #'equal)))
-
     (loop
       for i from 0 below 1997
-      when (= (aref ones i) (aref ones (+ i 4)))
-        do (setf (gethash (coerce (subseq changes i (+ 4 i)) 'list) h)
-                 (aref ones i))
+      ;; when (= (aref ones i) (aref ones (+ i 4)))
+        do (unless (gethash (coerce (subseq changes i (+ 4 i)) 'list) h)
+             (setf (gethash (coerce (subseq changes i (+ 4 i)) 'list) h)
+                   (aref ones (+ 4 i))))
       finally (return h))))
 
 (defun maximize-bananas (hashmaps)
   (let ((keys (remove-duplicates
                (mapcan #'a:hash-table-keys hashmaps)
                :test #'equal)))
-    (print keys)
     (loop
       for key in keys
       for bananas = (loop
