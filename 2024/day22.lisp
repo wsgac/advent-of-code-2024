@@ -40,9 +40,29 @@
 
 (defun problem-2 (&key (input *input-part-2-test*))
   (loop
+    with freq = (make-hash-table :test #'equal)
     for secret in (parse-input input)
-    collect (hashmap-of-changes secret) into hashmaps
-    finally (return (maximize-bananas hashmaps))))
+    do (process-secret secret freq)
+    finally (return (apply #'max (a:hash-table-values freq))
+                    )))
+
+(defun process-secret (secret freq)
+  (let* ((seen (make-hash-table :test #'equal))
+         (ones (coerce (loop
+                         repeat 2001
+                         for s = secret then (evolve s)
+                         collect (mod s 10))
+                       'vector))
+         (changes (loop
+                    for i from 1 to 2000
+                    collect (- (aref ones i) (aref ones (1- i))))))
+    (loop
+      for i from 0 below 1997
+      for seq = (coerce (subseq changes i (+ 4 i)) 'list)
+      unless (gethash seq seen)
+        do (progn
+             (setf (gethash seq seen) t)
+             (incf (gethash seq freq 0) (aref ones (+ 4 i)))))))
 
 (defun hashmap-of-changes (secret)
   (let* ((ones (coerce (loop
