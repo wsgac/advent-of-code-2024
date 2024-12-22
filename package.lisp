@@ -37,6 +37,7 @@
    :choose-combinations-replacing
    :concat-numbers
    :number->digits
+   :digits->number
    :char-arr->num-arr
    :extract-integers
    :array-loop
@@ -172,6 +173,18 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2024.day20)
+
+(defpackage #:advent-of-code-2024.day21
+  (:nicknames #:aoc2024.day21)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day21)
+
+(defpackage #:advent-of-code-2024.day22
+  (:nicknames #:aoc2024.day22)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day22)
 
 ;; AoC 2023 recap - renewed attempts at solving some problems from 2023
 

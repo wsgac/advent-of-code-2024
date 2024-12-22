@@ -129,6 +129,12 @@ all of them into a list."
                    (n->d n (cons r acc))))))
     (n->d n nil)))
 
+(defun digits->number (digits)
+  (reduce (lambda (n d) (+ (* 10 n) d)) digits :initial-value 0))
+
+#+(or)
+(digits->number '(1 2 3 4))
+
 (defun char-arr->num-arr (arr)
   (let ((arr2 (make-array (array-dimensions arr)))
         (rows (array-dimension arr 0))
