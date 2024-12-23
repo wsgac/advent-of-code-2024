@@ -76,6 +76,7 @@ collision."
 #+(or)
 (merge-plists '((:a 1 :b 2) (:b 20 :c 30)) :value-selector #'+)
 
+#+(or)
 (defun parse-integers (string &key
                                 (sep '(#\space #\tab)))
   "Assuming that `string` is a string of space-delimited integers, parse
@@ -88,11 +89,46 @@ all of them into a list."
     while n
     collect n))
 
+(defun parse-integers (string &key
+                                (sep '(#\space)))
+  "Assuming that `string` is a string of space-delimited integers, parse
+all of them into a list."
+  (loop
+    for int-string in (uiop:split-string string :separator sep)
+    for maybe-int = (parse-integer int-string :junk-allowed t)
+    when maybe-int
+      collect maybe-int))
+
 #+(or)
 (parse-integers "0 1 2 3 4 5")
 
 #+(or)
 (parse-integers "0  1  2  3  4  5")
+
+#+(or)
+(defun choose-combinations-not-replacing (set k)
+  (labels ((choose-tail (set k acc)
+             (when (>= (length set) k)
+               (if (zerop k)
+                   acc
+                   (let ((acc-w/o-first (choose-tail (rest set) k acc))
+                         (acc-w/-first
+                           (choose-tail (rest set) (1- k)
+                                        (or (mapcar (a:curry #'cons (first set)) acc)
+                                            (list (list (first set)))))))
+                     (append acc-w/-first
+                             acc-w/o-first))))))
+    (choose-tail set k nil)))
+
+(defun choose-combinations-not-replacing (set k)
+  (when (<= k (length set))
+    (cond
+      ((zerop k) nil)
+      ((= k 1) (mapcar #'list set))
+      (t (append (choose-combinations-not-replacing (rest set) k)
+                 (loop
+                   for sub in (choose-combinations-not-replacing (rest set) (1- k))
+                   collect (cons (first set) sub)))))))
 
 (defun choose-combinations-replacing (set k)
   (labels ((choose-tail (set k acc)
@@ -208,3 +244,47 @@ all of them into a list."
 (defun manhattan (p1 p2)
   "Manhattan metric between `p1` and `p2`."
   (reduce #'+ (mapcar (lambda (a b) (abs (- a b))) p1 p2)))
+
+;; (defun bron-kerbosch-with-pivot (r p x graph cliques)
+;;   (if (and (endp p) (endp x))
+;;       (values (cons r cliques) r p x)
+;;       (progn
+;;         (loop
+;;          ;; for v in (set-difference p (gethash pivot graph))
+;;         for v in p
+;;          for nv = (gethash v graph)
+;;          do (multiple-value-setq (cliques r p x)
+;;               (bron-kerbosch-with-pivot (union r (list v))
+;;                                         (intersection p (gethash v graph))
+;;                                         (intersection x (gethash v graph))
+;;                                         graph cliques))
+;;          do (a:removef p v)
+;;          do (pushnew v x))
+;;         (values cliques r p x))))
+
+;; Borrowed from https://github.com/fcbr/graph-algorithms/blob/master/maximal-cliques.lisp
+(defun bron-kerbosch (R P X neighbors-fn visitor-fn)
+  "The basic form of the Bron–Kerbosch algorithm is a recursive
+backtracking algorithm that searches for all maximal cliques in a
+given graph G. More generally, given three disjoint sets of vertices
+R, P, and X, it finds the maximal cliques that include all of the
+vertices in R, some of the vertices in P, and none of the vertices in
+X. In each call to the algorithm, P and X are disjoint sets whose
+union consists of those vertices that form cliques when added to R. In
+other words, P ∪ X is the set of vertices which are joined to every
+element of R. When P and X are both empty there are no further
+elements that can be added to R, so R is a maximal clique and the
+algorithm outputs R."
+  (when (and (a:emptyp P) (a:emptyp X))
+    (funcall visitor-fn R))
+  (dolist (v P)
+    (let ((nv (funcall neighbors-fn v)))
+      (bron-kerbosch
+       (union R (list v))
+       (intersection P nv)
+       (intersection X nv)
+       neighbors-fn visitor-fn)
+      (a:removef P v)
+      (push v X))))
+
+

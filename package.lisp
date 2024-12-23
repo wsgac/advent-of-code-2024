@@ -35,6 +35,7 @@
    :merge-plists
    :parse-integers
    :choose-combinations-replacing
+   :choose-combinations-not-replacing
    :concat-numbers
    :number->digits
    :digits->number
@@ -43,6 +44,7 @@
    :array-loop
    :vec+
    :manhattan
+   :bron-kerbosch
    ;; Priority Queue
    :priority-queue
    :pq-push
@@ -185,6 +187,12 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2024.day22)
+
+(defpackage #:advent-of-code-2024.day23
+  (:nicknames #:aoc2024.day23)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day23)
 
 ;; AoC 2023 recap - renewed attempts at solving some problems from 2023
 
