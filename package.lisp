@@ -194,6 +194,18 @@
 
 (apply-local-nicknames '#:advent-of-code-2024.day23)
 
+(defpackage #:advent-of-code-2024.day24
+  (:nicknames #:aoc2024.day24)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day24)
+
+(defpackage #:advent-of-code-2024.day25
+  (:nicknames #:aoc2024.day25)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2024.day25)
+
 ;; AoC 2023 recap - renewed attempts at solving some problems from 2023
 
 (defpackage #:advent-of-code-2023.day01
