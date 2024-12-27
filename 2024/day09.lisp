@@ -28,8 +28,48 @@
       for el across parsed
       sum (* i (or el (pop rev))))))
 
+(defun find-first-gap (arr n)
+  "Find the first gap of length at least `n` composed of NILs."
+  (search (make-array (list n) :initial-element nil) arr))
+
+(defun find-last-file (arr prev-last)
+  (loop
+    with id
+    with id-end
+    for i downfrom (1- (or prev-last (length arr))) to 0
+    unless id
+      do (progn
+           (setf id (aref arr i))
+           (setf id-end (1+ i)))
+    until (and id (or (not (aref arr i)) (/= id (aref arr i))))
+    finally (return (list (1+ i) id-end))))
+
+(defun move-file (arr first-gap last-file)
+  (loop
+    for i from 0
+    for fp from (first last-file) below (second last-file)
+    do (setf (aref arr (+ first-gap i))
+             (aref arr fp))
+    do (setf (aref arr fp) nil)))
+
+(defun checksum (arr)
+  (loop
+    for i from 0 below (length arr)
+    when (aref arr i)
+      sum (* i (aref arr i))))
+
 (defun problem-2 (&key (input *input-part-2-test*))
-  )
+  (let ((arr (parse-input input)))
+    (loop
+      with prev-last
+      for last-file = (find-last-file arr prev-last)
+      for last-file-length = (apply #'- (reverse last-file))
+      for first-gap = (find-first-gap arr last-file-length)
+      do (setf prev-last (first last-file))
+      when (and first-gap (< first-gap (first last-file)))
+        do (move-file arr first-gap last-file)
+      until (zerop prev-last)
+      finally (return (checksum arr)))))
 
 (defparameter *input-part-1-test*
   "2333133121414131402")

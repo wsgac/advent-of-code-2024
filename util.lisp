@@ -288,3 +288,5 @@ algorithm outputs R."
       (push v X))))
 
 
+(defun compose-n (f n)
+  (apply #'a:compose (make-list n :initial-element f)))

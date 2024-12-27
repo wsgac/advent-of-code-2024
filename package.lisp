@@ -45,6 +45,7 @@
    :vec+
    :manhattan
    :bron-kerbosch
+   :compose-n
    ;; Priority Queue
    :priority-queue
    :pq-push
