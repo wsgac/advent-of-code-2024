@@ -46,6 +46,7 @@
    :manhattan
    :bron-kerbosch
    :compose-n
+   :vector-push-n
    ;; Priority Queue
    :priority-queue
    :pq-push

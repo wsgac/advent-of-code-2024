@@ -290,3 +290,9 @@ algorithm outputs R."
 
 (defun compose-n (f n)
   (apply #'a:compose (make-list n :initial-element f)))
+
+(defun vector-push-n (vec item n)
+  (loop
+    repeat n
+    do (vector-push-extend item vec)
+    finally (return vec)))

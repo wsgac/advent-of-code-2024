@@ -1,36 +1,33 @@
 (in-package #:advent-of-code-2024.day09)
 
-
 (defun parse-input (input)
   (loop
+    with arr = (make-array 0 :fill-pointer t)
     for i from 0
     for c across input
-    for num = (digit-char-p c)
-    collect (cons num (if (evenp i) (truncate i 2) nil)) into compact
-    if (evenp i)
-      sum num into non-nil
-    append (make-list num :initial-element (if (evenp i) (truncate i 2) nil))
-      into files
-    finally (return (values
-                     (coerce files 'vector)
-                     non-nil
-                     compact))))
-
-(defun problem-1 (&key (input *input-part-1-test*))
-  (multiple-value-bind (parsed non-nil)
-      (parse-input input)
-    (loop
-      with rev = (loop
-                   for el across (reverse parsed)
-                   when el
-                     collect el)
-      for i from 0 below non-nil
-      for el across parsed
-      sum (* i (or el (pop rev))))))
+    for char-int = (digit-char-p c)
+    when (evenp i)
+      sum char-int into non-nil
+    do (util:vector-push-n arr (when (evenp i) (truncate i 2)) char-int)
+    finally (return (values arr non-nil))))
 
 (defun find-first-gap (arr n)
   "Find the first gap of length at least `n` composed of NILs."
-  (search (make-array (list n) :initial-element nil) arr))
+  (loop
+    with gap-start
+    with gap-stop
+    for i from 0
+    for el across arr
+    when (and (not gap-start) (not el))
+      do (setf gap-start i
+               gap-stop i)
+    when (not el)
+      do (incf gap-stop)
+    when (and gap-stop gap-start (= n (- gap-stop gap-start)))
+      do (return gap-start)
+    when el
+      do (setf gap-start nil)
+    ))
 
 (defun find-last-file (arr prev-last)
   (loop
@@ -41,18 +38,22 @@
       do (progn
            (setf id (aref arr i))
            (setf id-end (1+ i)))
-    until (and id (or (not (aref arr i)) (/= id (aref arr i))))
+    until (and id (or (not (aref arr i))
+                      (/= id (aref arr i))))
     finally (return (list (1+ i) id-end))))
 
 (defun move-file (arr first-gap last-file)
   (loop
     for i from 0
     for fp from (first last-file) below (second last-file)
-    do (setf (aref arr (+ first-gap i))
-             (aref arr fp))
-    do (setf (aref arr fp) nil)))
+    do (rotatef (aref arr (+ first-gap i))
+                (aref arr fp))
+    ;; do (setf (aref arr (+ first-gap i))
+    ;;          (aref arr fp))
+    ;; do (setf (aref arr fp) nil)
+    ))
 
-(defun checksum (arr)
+(defun checksum-2 (arr)
   (loop
     for i from 0 below (length arr)
     when (aref arr i)
@@ -63,13 +64,39 @@
     (loop
       with prev-last
       for last-file = (find-last-file arr prev-last)
-      for last-file-length = (apply #'- (reverse last-file))
+      for last-file-length = (- (second last-file)
+                                (first last-file)) ;; (apply #'- (reverse last-file))
       for first-gap = (find-first-gap arr last-file-length)
       do (setf prev-last (first last-file))
       when (and first-gap (< first-gap (first last-file)))
         do (move-file arr first-gap last-file)
       until (zerop prev-last)
-      finally (return (checksum arr)))))
+      finally (return (checksum-2 arr)))))
+
+(defun problem-1 (&key (input *input-part-1-test*))
+  (multiple-value-bind (layout count-non-nil-items)
+      (parse-input input)
+    (loop
+      repeat count-non-nil-items
+      with len = (length layout)
+      with i-rev = len
+      for i from 0
+      for el across layout
+      when (null el)
+        do (progn
+             (loop
+               do (decf i-rev)
+               until (not (null (aref layout i-rev))))
+             (rotatef (aref layout i)
+                      (aref layout i-rev)))
+      finally (return (checksum-1 layout)))))
+
+(defun checksum-1 (layout)
+  (loop
+    for i from 0
+    for el across layout
+    while el
+    sum (* i el)))
 
 (defparameter *input-part-1-test*
   "2333133121414131402")
