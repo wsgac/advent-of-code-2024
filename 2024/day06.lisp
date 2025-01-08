@@ -3,6 +3,16 @@
 (defun parse-input (input)
   (util:parse-string-into-array input))
 
+;; [ cosΘ  -sinΘ ] [x]
+;; [ sinΘ   cosΘ ] [y]
+;;
+;; Θ = -π/2
+;; [dr'] = [ cosΘ  -sinΘ ] [dr]
+;; [dc']   [ sinΘ   cosΘ ] [dc]
+;;
+;; [ 0  1 ]
+;; [ -1 0 ]
+
 (defun rotate-right (delta)
   (destructuring-bind (dr dc) delta
     (list (+ (* 0 dr) (* 1 dc))
@@ -15,17 +25,16 @@
 (rotate-right '(1 0))
 #+(or)
 (rotate-right '(0 -1))
+;; All 4 directions have rank 4 under rotation
+#+(or)
+(every (lambda (d)
+         (equal d (funcall (compose-n #'rotate-right 4) d)))
+       '((-1 0) (0 1) (1 0) (0 -1)))
 
 (defun locate-starting-point (arr)
-  (loop
-    for row from 0 below (array-dimension arr 0)
-    do (loop
-         for col from 0 below (array-dimension arr 1)
-         when (char= #\^ (aref arr row col))
-           do (return-from locate-starting-point (list row col)))))
-
-(defun add-delta (pos delta)
-  (mapcar #'+ pos delta))
+  (util:array-loop (arr (row col) :item el)
+    (when (char= #\^ el)
+      (return-from locate-starting-point (list row col)))))
 
 (defun problem-1 (&key (input *input-part-1-test*))
   (let* ((arr (parse-input input))
@@ -35,71 +44,106 @@
     
     (loop
       with delta = delta
-      for pos = position then (add-delta pos delta)
+      for pos = position then (util:vec+ pos delta)
       do (setf (gethash pos visited) t)
-      until (not (apply #'array-in-bounds-p arr (add-delta pos delta)))
-      if (char= #\# (apply #'aref arr (add-delta pos delta)))
+      while (apply #'array-in-bounds-p arr (util:vec+ pos delta))
+      if (char= #\# (apply #'aref arr (util:vec+ pos delta)))
         do (setf delta (rotate-right delta)))
     (hash-table-count visited)))
 
-(defun get-rotation-points (ht)
+;; Take 2
+
+(defun find-obstacles (arr)
+  (let ((h (make-hash-table :test #'equal)))
+    (util:array-loop (arr (r c) :item el)
+      (when (char= #\# el)
+        (setf (gethash `(,r ,c) h) t)))
+    h))
+
+(defun solve (arr fn)
+  (declare (optimize debug))
+  (let* ((visited (make-hash-table :test #'equal))
+         (obstacles (find-obstacles arr))
+         (start (locate-starting-point arr)))
+    (loop
+      with delta = '(-1 0)
+      for pos = start then (util:vec+ pos delta)
+      while (apply #'array-in-bounds-p arr pos)
+      when (gethash (vec+ pos delta) obstacles)
+        do (setf delta (rotate-right delta))
+      do (setf (gethash (list pos delta) visited) t))
+    ;; (break)
+    (funcall fn arr visited obstacles start)))
+
+(defun get-unique-locations (arr visited obstacles start)
+  (declare (ignore arr obstacles start))
+  (length (remove-duplicates
+           (mapcar #'first (a:hash-table-keys visited))
+           :test #'equal)))
+
+(defun problem-1 (&key (input *input-part-1-test*))
+  (let ((arr (parse-input input)))
+    (solve arr #'get-unique-locations)))
+
+(defun count-potential-loops (arr visited obstacles start)
   (loop
-    for pos being the hash-keys in ht using (hash-value v)
-    if (eql v :rotation)
-      collect pos))
+    with delta = '(-1 0)
+    for pos = start then (vec+ pos delta)
+    while (apply #'array-in-bounds-p arr pos)
+    when (gethash (vec+ pos delta) obstacles)
+      do (setf delta (rotate-right delta))
+    count (loop-possible? arr visited pos (rotate-right delta) obstacles)))
 
-(defun get-obstacles (ht)
-  (loop
-    for pos being the hash-keys in ht using (hash-value v)
-    if (eql v :obstacle)
-      collect pos))
-
-(defun find-collisions (p1 p2 p3 obstacles)
-  (let* ((rowmin (min (car p1) (car p2) (car p3)))
-         (rowmax (max (car p1) (car p2) (car p3)))
-         (colmin (min (cadr p1) (cadr p2) (cadr p3)))
-         (colmax (max (cadr p1) (cadr p2) (cadr p3))))
-    (find-if (lambda (p)
-               (and (< rowmin (car p) rowmax)
-                    (< colmin (cadr p) colmax)))
-             obstacles)))
-
-(defun incomplete-rectangle? (p1 p2 p3 obstacles)
-  (and
-   (or (and (= (first p1) (first p2))
-            (= (second p2) (second p3)))
-       (and (= (second p1) (second p2))
-            (= (first p2) (first p3))))
-   (not (find-collisions p1 p2 p3 obstacles))))
-
-(defun find-incomplete-rectangles (points obstacles)
-  (loop
-    for (p1 . r1) on points
-    sum (loop
-          for (p2 . r2) on r1
-          sum (loop
-                for (p3 . r3) on r2
-                if (incomplete-rectangle? p1 p2 p3 obstacles)
-                  count 1))))
+(defun loop-possible? (arr visited start delta obstacles)
+  (declare (ignore visited))
+  (let ((max-iter (* 2 (apply #'+ (array-dimensions arr)))))
+    (loop
+      for i from 0
+      repeat max-iter
+      for pos = start then (vec+ pos delta)
+      while (apply #'array-in-bounds-p arr pos)
+      when (gethash (vec+ pos delta) obstacles)
+        do (setf delta (rotate-right delta))
+      when (and (plusp i) (equal pos start))
+        do (return-from loop-possible? t)
+      finally (return nil))))
 
 (defun problem-2 (&key (input *input-part-1-test*))
-  (let* ((arr (parse-input input))
-         (visited (make-hash-table :test #'equal))
-         (delta '(-1 0)) ; facing up
-         (position (locate-starting-point arr)))
+  (let ((arr (parse-input input)))
+    (solve arr #'count-potential-loops)))
+
+;; (defun problem-2 (&key (input *input-part-1-test*))
+;;   (let* ((arr (parse-input input))
+;;          (visited (make-hash-table :test #'equal))
+;;          (delta '(-1 0)) ; facing up
+;;          (position (locate-starting-point arr)))
     
-    (loop
-      with delta = delta
-      for pos = position then (add-delta pos delta)
-      do (setf (gethash pos visited) t)
-      until (not (apply #'array-in-bounds-p arr (add-delta pos delta)))
-      if (char= #\# (apply #'aref arr (add-delta pos delta)))
-        do (progn (setf (gethash (add-delta pos delta) visited) :obstacle)
-                  (setf delta (rotate-right delta))
-                  (setf (gethash pos visited) :rotation)))
-    (find-incomplete-rectangles
-     (get-rotation-points visited)
-     (get-obstacles visited))))
+;;     (loop
+;;       with delta = delta
+;;       for pos = position then (util:vec+ pos delta)
+;;       do (setf (gethash pos visited) t)
+;;       until (not (apply #'array-in-bounds-p arr (util:vec+ pos delta)))
+;;       if (char= #\# (apply #'aref arr (util:vec+ pos delta)))
+;;         do (progn (setf (gethash (util:vec+ pos delta) visited) :obstacle)
+;;                   (setf delta (rotate-right delta))
+;;                   (setf (gethash pos visited) :rotation)))
+;;     ;; (break "Visited: ~a" visited)
+;;     (analyze-incomplete-rectangles
+;;      arr
+;;      (get-rotation-points visited)
+;;      (get-obstacles visited))))
+
+;;   0123456789
+;; 0 ....#.....
+;; 1 .........#
+;; 2 ..........
+;; 3 ..#.......
+;; 4 .......#..
+;; 5 ..........
+;; 6 .#..^.....
+;; 7 ........#.
+;; 8 #.........
+;; 9 ......#...
 
 (defparameter *input-part-1-test*
   "....#.....

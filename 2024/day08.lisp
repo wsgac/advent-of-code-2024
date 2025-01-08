@@ -6,13 +6,9 @@
 
 (defun classify-antennas (arr)
   (let ((h (make-hash-table)))
-    (loop
-      for row from 0 below (array-dimension arr 0)
-      do (loop
-           for col from 0 below (array-dimension arr 1)
-           for c = (aref arr row col)
-           if (alphanumericp c)
-             do (push (cons row col) (gethash c h))))
+    (util:array-loop (arr (row col) :item el)
+      (when (alphanumericp el)
+        (push (cons row col) (gethash el h))))
     h))
 
 (defun find-antinodes (locations arr &key (antinode-pairing #'pair-antinodes))
@@ -27,7 +23,7 @@
   (let* ((dr (- (car l2) (car l1)))
          (dc (- (cdr l2) (cdr l1))))
     (remove-if-not (lambda (p)
-                     (ls-user:array-in-bounds-p arr (car p) (cdr p)))
+                     (array-in-bounds-p arr (car p) (cdr p)))
                    (list (cons (- (car l1) dr) (- (cdr l1) dc))
                          (cons (+ (car l2) dr) (+ (cdr l2) dc))))))
 

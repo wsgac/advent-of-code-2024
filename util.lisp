@@ -207,11 +207,11 @@ all of them into a list."
 ;; (array-loop (arr (r c) :item el)
 ;;   (format t "Row: ~a Col: ~a Item: ~a~%" r c el))
 
-;; Priority Queue
+;; Priority Queue - BEGIN
 
-(defclass priority-queue ()
+(defclass priority-queue-list ()
   ((queue
-    :initarg :list
+    :initarg :queue
     :initform nil
     :accessor queue)
    (sorted
@@ -224,19 +224,104 @@ all of them into a list."
     :initarg :key
     :accessor key)))
 
-(defmethod pq-push ((pq priority-queue) item)
+(defmethod pq-push ((pq priority-queue-list) item)
   (prog1 (push item (queue pq))
     (setf (sorted pq) nil)))
 
-(defmethod pq-pop ((pq priority-queue))
+(defmethod pq-pop ((pq priority-queue-list))
   (with-slots (queue cmp key sorted) pq
     (unless sorted
       (setf queue (sort queue cmp :key key)
             sorted t))
     (pop queue)))
 
+(defmethod pq-empty? ((pq priority-queue-list))
+  (endp (queue pq)))
+
+#+(or)
+(let ((q (make-instance 'priority-queue-list :cmp #'> :key #'second))
+      (items '((a 1) (b 2) (c 3) (d 4) (e 5))))
+  (dolist (i items)
+    (pq-push q i))
+  (loop
+    collect (pq-pop q)
+    until (pq-empty? q)))
+
+(defclass priority-queue ()
+  ((heap
+    :initarg :heap
+    :initform nil
+    :accessor heap)
+   (vec-size
+    :initarg :vec-size)
+   (cmp
+    :initarg :cmp
+    :accessor cmp)
+   (key
+    :initarg :key
+    :accessor key)))
+
+(defmethod initialize-instance :after ((pq priority-queue) &key &allow-other-keys)
+  (with-slots (heap cmp key vec-size) pq
+    (let ((h (serapeum:make-heap :key key :test cmp :size vec-size)))
+      (unless (endp heap)
+        (dolist (item heap)
+          (serapeum:heap-insert h item)))
+      (setf heap h))))
+
+(defmethod pq-push ((pq priority-queue) item)
+  (with-slots (heap) pq
+    (serapeum:heap-insert heap item)))
+
+(defmethod pq-pop ((pq priority-queue))
+  (with-slots (heap) pq
+    (serapeum:heap-extract-maximum heap)))
+
 (defmethod pq-empty? ((pq priority-queue))
-  (endp (list pq)))
+  (with-slots (heap) pq
+    (a:emptyp (serapeum::heap-vector heap))))
+
+#+(or)
+(let ((q (make-instance 'priority-queue :cmp #'> :key #'second))
+      (items '((a 1) (b 2) (c 3) (d 4) (e 5))))
+  (dolist (i (a:shuffle items))
+    (pq-push q i))
+  (loop
+    collect (pq-pop q)
+    until (pq-empty? q)))
+
+#+(or)
+(let ((q (make-instance 'priority-queue :cmp #'< :key #'second))
+      (items '((a 1) (b 2) (c 3) (d 4) (e 5))))
+  (dolist (i (a:shuffle items))
+    (pq-push q i))
+  (loop
+    collect (pq-pop q)
+    until (pq-empty? q)))
+
+#+(or)
+(let ((ql (make-instance 'priority-queue-list :cmp #'> :key #'second))
+      (qh (make-instance 'priority-queue :cmp #'> :key #'second :vec-size 100000)))
+  ;; Fill queues
+  (loop
+    for i from 0 to 100000
+    for s = (gensym)
+    do (pq-push ql (list s i))
+    do (pq-push qh (list s i)))
+  ;; Time processing of list-based priority queue
+  (print "list-based")
+  (time
+   (loop
+     do (pq-pop ql)
+     until (pq-empty? ql)))
+  ;; Time processing of heap-based priority queue
+  (print "heap-based")
+  (time
+   (loop
+     do (pq-pop qh)
+     until (pq-empty? qh))))
+
+;; Priority Queue - END
 
 (defun vec+ (v1 v2)
   (mapcar #'+ v1 v2))
