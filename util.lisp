@@ -15,55 +15,25 @@
   "Helper function to split STRING into a list of lines."
   (uiop:split-string string :separator '(#\Newline)))
 
-(defun square (x)
-  (* x x))
-(setf (fdefinition '^2) #'square)
-
-(defun cube (x)
-  (* x x x))
-(setf (fdefinition '^3) #'cube)
-
-(defun join-numbers (a b)
-  "Combine numbers A and B by juxtaposition."
-  (+ (* a (expt 10 (ceiling (log b 10)))) b))
-
-(defun position-in-2d-array (item array)
-  "Look for ITEM in a 2-dimensional ARRAY. When found, return its
-coordinates in the form (row, column). Otherwise, return NIL."
-  (destructuring-bind (d1 d2) (array-dimensions array)
-    (loop
-      for r from 0 below d1
-      do (loop
-	   for c from 0 below d2
-	   when (equal item (aref array r c))
-	     do (return-from position-in-2d-array (list r c))))))
-
-(defun parse-string-into-array (data &key adjustable)
-  "Parse DATA string into a 2-dimensional array."
-  (let ((char-list (mapcar (alexandria:rcurry #'coerce 'list)
-                                        ; (lambda (line) (coerce line 'list))
-			    (split-lines data))))
-    (make-array (list (length char-list) (length (first char-list)))
-		:adjustable adjustable
-		:initial-contents char-list)))
-
 (defun parse-string-into-list (data)
   "Parse DATA string into a 2-dimensional list."
   (mapcar (alexandria:rcurry #'coerce 'list)
-			 (split-lines data)))
+	  (split-lines data)))
 
 (defun merge-plists (plists &key
-                              (value-selector #'(lambda (a b) (declare (ignore a)) b))
-                              (value-selector-default 0))
+                              (value-selector #'(lambda (a b) (declare (ignore a)) b)))
   "Merge `plists` into a single plist. Optionally use `value-selector`, a
 2-argument function, to select which value will be used in case of key
-collision."
+collision. That defaults to a newest value selector."
   (loop
-    with plist = nil
-    for (key val) on (apply #'append plists) by #'cddr
-    do (setf (getf plist key)
-             (funcall value-selector (getf plist key value-selector-default) val))
-    finally (return plist)))
+    with result = nil
+    for plist in plists
+    do (loop
+         for (key val) on plist by #'cddr
+         do (setf (getf result key)
+                  (a:if-let (curr (getf result key))
+                    (funcall value-selector curr val) val)))
+    finally (return result)))
 
 #+(or)
 (merge-plists '((:a 1 :b 2) (:b 20 :c 30)))
@@ -72,9 +42,99 @@ collision."
               :value-selector #'max)
 #+(or)
 (merge-plists '((:a 1 :b 20 :c 300) (:a 10 :b 200 :c 3) (:a 100 :b 2 :c 30))
-              :value-selector #'min :value-selector-default most-positive-fixnum)
+              :value-selector #'min)
 #+(or)
 (merge-plists '((:a 1 :b 2) (:b 20 :c 30)) :value-selector #'+)
+
+;;;;;;;;;;;;;;;;;;;
+;; Combinatorics ;;
+;;;;;;;;;;;;;;;;;;;
+
+(defun factorial (n)
+  "Tail-recursive factorial function of `n`"
+  (labels ((tail (n acc)
+             (if (zerop n)
+                 acc
+                 (tail (1- n) (* n acc)))))
+    (tail n 1)))
+
+#+(or)
+(factorial 10)
+
+(defun choose (n k)
+  "Efficient implementation of the binomial coefficient ($\binom{n}{k}$)"
+  (loop
+    with result = 1
+    for i from n downto (1+ (max k (- n k)))
+    do (setf result (* result i))
+    finally (return (/ result (factorial (min k (- n k)))))))
+
+#+(or)
+(choose-naive 52 5)
+
+;; Compare with naive implementation
+#+(or)
+(flet ((choose-naive (n k)
+         (/ (factorial n)
+            (* (factorial (- n k)) (factorial k)))))
+  (princ "Naive: ")
+  (time (loop repeat 1000000 do (choose-naive 52 5)))
+  (princ "Efficient: ")
+  (time (loop repeat 1000000 do (choose 52 5))))
+
+#+(or)
+(defun choose-combinations-not-replacing (set k)
+  (labels ((choose-tail (set k acc)
+             (when (>= (length set) k)
+               (if (zerop k)
+                   acc
+                   (let ((acc-w/o-first (choose-tail (rest set) k acc))
+                         (acc-w/-first
+                           (choose-tail (rest set) (1- k)
+                                        (or (mapcar (a:curry #'cons (first set)) acc)
+                                            (list (list (first set)))))))
+                     (append acc-w/-first
+                             acc-w/o-first))))))
+    (choose-tail set k nil)))
+
+(defun choose-combinations-not-replacing (set k)
+  "Generate `k`-element combinations of elements from `set`, without
+replacing chosen elements. This should produce $\binom{|set|}{k}$
+or `(choose (length set) k)` items."
+  (when (<= k (length set))
+    (cond
+      ((zerop k) nil)
+      ((= k 1) (mapcar #'list set))
+      (t (append (choose-combinations-not-replacing (rest set) k)
+                 (loop
+                   for sub in (choose-combinations-not-replacing (rest set) (1- k))
+                   collect (cons (first set) sub)))))))
+
+#+(or)
+(choose-combinations-not-replacing '(a b c d e) 3)
+
+(defun choose-combinations-replacing (set k)
+  "Generate `k`-element combinations of elements from `set`, replacing
+chosen elements. This should produce $|set|^k$ items."
+  (labels ((choose-tail (set k acc)
+             (if (zerop k)
+                 acc
+                 (choose-tail set (1- k)
+                              (mapcan (lambda (s)
+                                        (if acc
+                                            (mapcar (lambda (l)
+                                                      (cons s l))
+                                                    acc)
+                                            (list (list s))))
+                                      set)))))
+    (choose-tail set k nil)))
+
+#+(or)
+(choose-combinations-replacing '(a b c d e) 3)
+
+;;;;;;;;;;;;;;;;;;;;;;
+;; Digits & Numbers ;;
+;;;;;;;;;;;;;;;;;;;;;;
 
 #+(or)
 (defun parse-integers (string &key
@@ -106,47 +166,14 @@ all of them into a list."
 (parse-integers "0  1  2  3  4  5")
 
 #+(or)
-(defun choose-combinations-not-replacing (set k)
-  (labels ((choose-tail (set k acc)
-             (when (>= (length set) k)
-               (if (zerop k)
-                   acc
-                   (let ((acc-w/o-first (choose-tail (rest set) k acc))
-                         (acc-w/-first
-                           (choose-tail (rest set) (1- k)
-                                        (or (mapcar (a:curry #'cons (first set)) acc)
-                                            (list (list (first set)))))))
-                     (append acc-w/-first
-                             acc-w/o-first))))))
-    (choose-tail set k nil)))
-
-(defun choose-combinations-not-replacing (set k)
-  (when (<= k (length set))
-    (cond
-      ((zerop k) nil)
-      ((= k 1) (mapcar #'list set))
-      (t (append (choose-combinations-not-replacing (rest set) k)
-                 (loop
-                   for sub in (choose-combinations-not-replacing (rest set) (1- k))
-                   collect (cons (first set) sub)))))))
-
-(defun choose-combinations-replacing (set k)
-  (labels ((choose-tail (set k acc)
-             (if (zerop k)
-                 acc
-                 (choose-tail set (1- k)
-                              (mapcan (lambda (s)
-                                        (if acc
-                                            (mapcar (lambda (l)
-                                                      (cons s l))
-                                                    acc)
-                                            (list (list s))))
-                                      set)))))
-    (choose-tail set k nil)))
+(parse-integers "0-1-2-3-4-5" :sep '(#\-))
 
 (defun concat-numbers (a b)
   (if (zerop b) (* 10 a)
       (+ (* a (expt 10 (floor (1+ (log b 10))))) b)))
+
+#+(or)
+(concat-numbers 12345 67890)
 
 ;; (defun number->digits (n)
 ;;   (loop
@@ -164,6 +191,12 @@ all of them into a list."
                      (truncate n 10)
                    (n->d n (cons r acc))))))
     (n->d n nil)))
+
+#+(or)
+(number->digits 12345)
+
+#+(or)
+(number->digits 0)
 
 (defun digits->number (digits)
   (reduce (lambda (n d) (+ (* 10 n) d)) digits :initial-value 0))
@@ -187,6 +220,42 @@ all of them into a list."
   (mapcar #'parse-integer
           (ppcre:all-matches-as-strings "-?[0-9]+" string)))
 
+(defun square (x)
+  (* x x))
+(setf (fdefinition '^2) #'square)
+
+(defun cube (x)
+  (* x x x))
+(setf (fdefinition '^3) #'cube)
+
+(defun join-numbers (a b)
+  "Combine numbers A and B by juxtaposition."
+  (+ (* a (expt 10 (ceiling (log b 10)))) b))
+
+;;;;;;;;;;;;
+;; Arrays ;;
+;;;;;;;;;;;;
+
+(defun position-in-2d-array (item array)
+  "Look for ITEM in a 2-dimensional ARRAY. When found, return its
+coordinates in the form (row, column). Otherwise, return NIL."
+  (destructuring-bind (d1 d2) (array-dimensions array)
+    (loop
+      for r from 0 below d1
+      do (loop
+	   for c from 0 below d2
+	   when (equal item (aref array r c))
+	     do (return-from position-in-2d-array (list r c))))))
+
+(defun parse-string-into-array (data &key adjustable)
+  "Parse DATA string into a 2-dimensional array."
+  (let ((char-list (mapcar (alexandria:rcurry #'coerce 'list)
+                                        ; (lambda (line) (coerce line 'list))
+			   (split-lines data))))
+    (make-array (list (length char-list) (length (first char-list)))
+		:adjustable adjustable
+		:initial-contents char-list)))
+
 (defun %array-loop (array dim indices item body)
   `(loop
      for ,(nth dim indices) from 0 below (array-dimension ,array ,dim)
@@ -196,6 +265,10 @@ all of them into a list."
            `(do ,(%array-loop array (1+ dim) indices item body)))))
 
 (defmacro array-loop ((array (&rest indices) &key (item nil itemp)) &body body)
+  "Abstract away the nested loop when iterating through an n-dimensional
+`array`. Bind identifiers listed in `indices` to consecutive
+dimensional indices of `array`. When provided, bind consecutive item
+values to `item`. For each such iteration execute `body`."
   (a:once-only (array)
     `(progn
        (assert (= (array-rank ,array) ,(length indices))
@@ -203,9 +276,15 @@ all of them into a list."
                (array-rank ,array) ,(length indices))
        ,(%array-loop array 0 indices (if itemp item (gensym)) body))))
 
-
-;; (array-loop (arr (r c) :item el)
-;;   (format t "Row: ~a Col: ~a Item: ~a~%" r c el))
+#+(or)
+(let ((arr (make-array '(3 3 3)
+                       :initial-contents
+                       (loop for i below 3
+                             collect (loop for j below 3
+                                           collect (loop for k below 3
+                                                         collect (+ (* 9 i) (* 3 j) k)))))))
+  (array-loop (arr (d1 d2 d3) :item el)
+    (format t "Dimension 1: ~a Dimension 2: ~a Dimension 3: ~a Item: ~a~%" d1 d2 d3 el)))
 
 ;; Priority Queue - BEGIN
 
@@ -309,13 +388,13 @@ all of them into a list."
     do (pq-push ql (list s i))
     do (pq-push qh (list s i)))
   ;; Time processing of list-based priority queue
-  (print "list-based")
+  (princ "list-based")
   (time
    (loop
      do (pq-pop ql)
      until (pq-empty? ql)))
   ;; Time processing of heap-based priority queue
-  (print "heap-based")
+  (princ "heap-based")
   (time
    (loop
      do (pq-pop qh)
@@ -374,10 +453,41 @@ algorithm outputs R."
 
 
 (defun compose-n (f n)
+  "Compose `n` instaces of function `f`."
   (apply #'a:compose (make-list n :initial-element f)))
 
+#+(or)
+(funcall (compose-n #'square 3) 2)
+
 (defun vector-push-n (vec item n)
+  "Push `n` instances of `item` to vector `vec`. This requires `vec` to
+have a fill pointer and be adjustable."
   (loop
     repeat n
     do (vector-push-extend item vec)
     finally (return vec)))
+
+#+(or)
+(let ((v (make-array '(3) :initial-contents '(1 2 3) :fill-pointer t :adjustable t)))
+  (vector-push-n v 10 5)
+  v)
+
+;;;;;;;;;;;;;;;;;
+;; Odds & Ends ;;
+;;;;;;;;;;;;;;;;;
+
+(defun country->flag (country)
+  "Convert a two-letter `country` code into a Unicode flag."
+  (flet ((regional-indicator (c)
+           (assert (char<= #\a (char-downcase c) #\z)
+                   nil "Character needs to be a Latin letter. Got ~c instead." c)
+           (code-char (+ (char-code #\🇦) ;; Alternatively use Unicode 0x1f1e6
+                         (- (char-code (char-downcase c)) (char-code #\a))))))
+    (map 'string #'regional-indicator country)))
+
+#+(or)
+(country->flag "pl")
+
+#+(or)
+(country->flag "UA")
+
