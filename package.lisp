@@ -16,7 +16,7 @@
                                            pkg))))
 
 (defpackage #:advent-of-code-2024.util
-  (:nicknames #:aoc2024.util #:util)
+  (:nicknames #:aoc2024.util #:util #:u)
   (:use #:cl)
   (:local-nicknames (#:a #:alexandria)
                     (#:lt #:local-time))
@@ -42,7 +42,10 @@
    :char-arr->num-arr
    :extract-integers
    :array-loop
+   :2d-array->string
+   :2d-array->png
    :vec+
+   :aref*
    :manhattan
    :bron-kerbosch
    :compose-n

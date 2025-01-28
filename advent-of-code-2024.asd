@@ -15,6 +15,7 @@
                :trivia
                :str
                :serapeum
+               :zpng
                ;; :fset
 	       )
   :components ((:file "package")

@@ -236,6 +236,20 @@ all of them into a list."
 ;; Arrays ;;
 ;;;;;;;;;;;;
 
+(defun aref* (array indices)
+  "Lookup the contents of `array` under indices contained in
+`indices`. The length of `indices` must be the same as the rank of
+`array`."
+  (assert (= (length indices) (array-rank array)))
+  (apply #'aref array indices))
+
+(defun (setf aref*) (val array indices)
+  "Lookup the contents of `array` under indices contained in
+`indices`. The length of `indices` must be the same as the rank of
+`array`."
+  (assert (= (length indices) (array-rank array)))
+  (setf (apply #'aref array indices) val))
+
 (defun position-in-2d-array (item array)
   "Look for ITEM in a 2-dimensional ARRAY. When found, return its
 coordinates in the form (row, column). Otherwise, return NIL."
@@ -491,3 +505,20 @@ have a fill pointer and be adjustable."
 #+(or)
 (country->flag "UA")
 
+(defvar *alphabet* (map 'string (lambda (c) (code-char (+ c (char-code #\a)))) (a:iota 26)))
+
+(defun all-your-flags-are-belong-to-us ()
+  (flet ((regional-indicator (c)
+           (assert (char<= #\a (char-downcase c) #\z)
+                   nil "Character needs to be a Latin letter. Got ~c instead." c)
+           (code-char (+ (char-code #\🇦) ;; Alternatively use Unicode 0x1f1e6
+                         (- (char-code (char-downcase c)) (char-code #\a))))))
+   (with-output-to-string (s)
+     (format s "~%  ~{~a​~}~%" (mapcar #'regional-indicator (coerce *alphabet* 'list)))
+     (loop
+       for c1 across *alphabet*
+       do (format s "~a​" (regional-indicator c1))
+       do (loop
+            for c2 across *alphabet*
+            do (format s "~a" (country->flag (format nil "~c~c" c1 c2))))
+       do (terpri s)))))
