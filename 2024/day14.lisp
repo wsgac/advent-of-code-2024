@@ -47,11 +47,18 @@
 positions, i.e. middle 1/4 of the area described by `dimensions`."
   (loop
     with (cols rows) = dimensions
-    for (x y) in positions
+    for ((x y) nil) in positions
     count (and (< (truncate cols 4) x (* 3 (truncate cols 4)))
                (< (truncate rows 4) y (* 3 (truncate rows 4))))
       into central
     finally (return (/ central (length positions)))))
+
+(defun picture-positions (positions dimensions)
+  (let ((arr (make-array (reverse dimensions) :initial-element #\space)))
+    (loop
+      for ((col row) nil) in positions
+      do (setf (aref arr row col) #\*))
+    (util:2d-array->png arr)))
 
 (defun problem-2 (&key (input *input-part-1-test*)
                     (dimensions '(11 7)))
@@ -60,17 +67,70 @@ stepping until most (> 1/2) robots arrange themselves into a
 picture. This picture will probably be concentrated around the center,
 so just try counting the percentage of robots in the middle 1/4 of our
 area."
-  (let* ((parsed (parse-input input))
-         (initial-positions (mapcar #'first parsed))
-         (velocities (mapcar #'second parsed)))
+  (let ((init-robots (parse-input input)))
     (loop
       for i from 0
-      for positions = initial-positions
-        then (mapcar (lambda (p v) (robot-step dimensions p v))
-                     positions velocities)
-      for central = (count-central positions dimensions)
+      for robots = init-robots then (evolve robots 1 dimensions)
+      for central = (count-central robots dimensions)
       when (> central 1/2)
-        do (return i))))
+        do (return (values i (picture-positions robots dimensions))))))
+
+;; Live session
+
+(defun parse-input (input)
+  (mapcar
+   (lambda (row)
+     (destructuring-bind (a b c d)
+         (util:extract-integers row)
+       ;; (list (list a b) (list c d))
+       `((,a ,b) (,c ,d))
+       ))
+   (util:split-lines input)))
+
+(defun bound-vec+ (v1 v2 dimensions)
+  (mapcar (lambda (c1 c2 d)
+            (mod (+ c1 c2) d))
+          v1 v2 dimensions))
+
+(defun vec-scale (v scale-factor)
+  (mapcar (lambda (c) (* c scale-factor)) v))
+
+
+;; V = d/t
+;; V = dx/dt
+(defun evolve (robots seconds grid-dimensions)
+  (loop
+    for (position velocity) in robots
+    for final-position = (bound-vec+ position
+                                     (vec-scale velocity
+                                                seconds)
+                                     grid-dimensions)
+    collect (list final-position velocity)))
+
+(defun safety-factor (robots dimensions)
+  (loop
+    with (cols rows) = dimensions
+    with mid-col = (truncate cols 2)
+    with mid-row = (truncate rows 2)
+    for ((x y)) in robots
+    count (and (< x mid-col)
+               (< y mid-row))
+      into q1
+    count (and (> x mid-col)
+               (< y mid-row))
+      into q2
+    count (and (< x mid-col)
+               (> y mid-row))
+      into q3
+    count (and (> x mid-col)
+               (> y mid-row))
+      into q4
+    finally (return (* q1 q2 q3 q4))))
+
+(defun problem-1 (input dimensions)
+  (let ((final-state (evolve (parse-input input)
+                             100 dimensions)))
+    (safety-factor final-state dimensions)))
 
 (defparameter *input-part-1-test*
   "p=0,4 v=3,-3

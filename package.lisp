@@ -1,22 +1,7 @@
 ;;;; package.lisp
 
-(defparameter *package-local-nicknames*
-  '(("a" . "alexandria")
-    ("lt" . "local-time")
-    ("tr" . "trivia")
-    ("ana" . "anaphora")
-    ("re" . "cl-ppcre")
-    ("s" . "serapeum")))
-
-(defun apply-local-nicknames (package)
-  (let ((pkg (find-package (symbol-name package))))
-    (dolist (alias *package-local-nicknames*)
-      (sb-unix::add-package-local-nickname (string-upcase (car alias))
-                                           (find-package (string-upcase (cdr alias)))
-                                           pkg))))
-
 (defpackage #:advent-of-code-2024.util
-  (:nicknames #:aoc2024.util #:util #:u)
+  (:nicknames #:aoc2024.util #:util)
   (:use #:cl)
   (:local-nicknames (#:a #:alexandria)
                     (#:lt #:local-time))
@@ -55,6 +40,31 @@
    :pq-push
    :pq-pop
    :pq-empty?))
+
+(defparameter *package-local-nicknames*
+  '(("a" . "alexandria")
+    ("lt" . "local-time")
+    ("tr" . "trivia")
+    ("ana" . "anaphora")
+    ("re" . "cl-ppcre")
+    ("s" . "serapeum")
+    ("u" . "util")
+    ("o" . "onlisp")))
+
+(defun apply-local-nicknames (package)
+  (let ((pkg (find-package (symbol-name package))))
+    (dolist (alias *package-local-nicknames*)
+      (sb-unix::add-package-local-nickname (string-upcase (car alias))
+                                           (find-package (string-upcase (cdr alias)))
+                                           pkg))))
+
+(defpackage #:advent-of-code-2024.onlisp
+  (:nicknames #:aoc2024.onlisp #:onlisp)
+  (:use #:cl)
+  (:export
+   ))
+
+(apply-local-nicknames '#:advent-of-code-2024.onlisp)
 
 (defpackage #:advent-of-code-2024.misc
   (:use #:cl))

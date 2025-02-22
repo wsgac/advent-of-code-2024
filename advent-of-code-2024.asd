@@ -19,6 +19,7 @@
                ;; :fset
 	       )
   :components ((:file "package")
+               (:file "onlisp")
 	       (:file "util")
                (:file "misc")
                ;; AoC 2023 recap

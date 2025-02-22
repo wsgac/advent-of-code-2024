@@ -25,19 +25,42 @@
       )
     (list robot arr)))
 
-(defun parse-input (input)
+(defun layout-to-double-array (layout)
+  (let* ((rows (u:split-lines layout))
+         (arr (make-array (list (length rows)
+                                (* 2 (length (first rows))))
+                          :initial-element #\.))
+         robot)
+    (loop
+      for r from 0
+      for row in rows
+      do (loop
+           for c from 0
+           for ch across row
+           do (if (char= #\@ ch)
+                  (setf robot `(,r ,(* 2 c)))
+                  (progn
+                    (setf (aref arr r (* 2 c)) ch)
+                    (setf (aref arr r (1+ (* 2 c))) ch)))))
+    (list robot arr)))
+
+(defun parse-input (input &key double)
   (destructuring-bind (layout moves)
       (str:split "
 
 " input)
     (cons (moves-to-deltas moves)
-          (layout-to-array layout))))
+          (if double
+              (layout-to-double-array layout)
+              (layout-to-array layout)))))
 
-(defun calculate-gps (array)
+(defun calculate-gps (array &key double)
   (let ((gps-sum 0))
     (u:array-loop (array (row col) :item el)
       (when (char= #\O el)
-        (incf gps-sum (+ (* 100 row) col))))
+        (incf gps-sum (+ (* 100 row) col))
+        (when double
+         (setf (aref array row (1+ col)) #\.))))
     gps-sum))
 
 (defun execute (robot array move)
@@ -66,6 +89,20 @@
       do (setf r (execute r arr move))
       ;; do (print (list r arr))
       finally (return (calculate-gps arr)))))
+
+(defun problem-2 (&key (input *input-part-1-test-1*))
+  (destructuring-bind (moves robot array)
+      (parse-input input :double t)
+    (loop
+      with arr = array
+      with r = robot
+      for move in moves
+      do (setf r (execute r arr move))
+      ;; do (print (list r arr))
+      finally ;; (return (calculate-gps arr :double t))
+              (return (2d-array->string arr)))))
+
+
 
 (defparameter *input-part-1-test-1*
   "########
