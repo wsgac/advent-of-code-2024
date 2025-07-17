@@ -283,3 +283,9 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2022.day01)
+
+(defpackage #:advent-of-code-2022.day02
+  (:nicknames #:aoc2022.day02)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day02)
