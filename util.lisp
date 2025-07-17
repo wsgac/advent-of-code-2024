@@ -1,4 +1,4 @@
-(in-package #:advent-of-code-2024.util)
+(in-package #:advent-of-code.util)
 
 (defun transpose (l)
   (apply #'mapcar #'list l))

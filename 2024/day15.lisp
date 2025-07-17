@@ -14,7 +14,7 @@
         collect d)))
 
 (defun layout-to-array (layout)
-  (let ((arr (aoc2024.util:parse-string-into-array layout))
+  (let ((arr (util:parse-string-into-array layout))
         robot)
     (util:array-loop (arr (row col) :item el)
       (when (char= el #\@)

@@ -1,7 +1,7 @@
 ;;;; package.lisp
 
-(defpackage #:advent-of-code-2024.util
-  (:nicknames #:aoc2024.util #:util)
+(defpackage #:advent-of-code.util
+  (:nicknames #:aoc.util #:util)
   (:use #:cl)
   (:local-nicknames (#:a #:alexandria)
                     (#:lt #:local-time))
@@ -70,6 +70,11 @@
   (:use #:cl))
 
 (apply-local-nicknames '#:advent-of-code-2024.misc)
+
+(defpackage #:advent-of-code-2024.sicp
+  (:use #:cl))
+
+(apply-local-nicknames '#:advent-of-code-2024.sicp)
 
 (defpackage #:advent-of-code-2024.day01
   (:nicknames #:aoc2024.day01)
@@ -270,3 +275,11 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2023.day08)
+
+;; AoC 2022 recap
+
+(defpackage #:advent-of-code-2022.day01
+  (:nicknames #:aoc2022.day01)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day01)

@@ -22,6 +22,11 @@
                (:file "onlisp")
 	       (:file "util")
                (:file "misc")
+               (:file "sicp")
+               ;; AoC 2022 recap
+               (:module "2022"
+                :components
+                ((:file "day01")))
                ;; AoC 2023 recap
                (:module "2023"
                 :components
