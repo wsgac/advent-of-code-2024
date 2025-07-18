@@ -15,6 +15,14 @@
   "Helper function to split STRING into a list of lines."
   (uiop:split-string string :separator '(#\Newline)))
 
+(defun split-string-on-indices (string indices)
+  (declare (string string)
+           (list indices))
+  (loop
+    :for start := 0 :then end
+    :for end :in (append indices (list nil))
+    :collect (subseq string start end)))
+
 (defun parse-string-into-list (data)
   "Parse DATA string into a 2-dimensional list."
   (mapcar (alexandria:rcurry #'coerce 'list)

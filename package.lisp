@@ -9,6 +9,7 @@
    :transpose
    :histogram
    :split-lines
+   :split-string-on-indices
    :square
    :^2
    :cube
@@ -289,3 +290,9 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2022.day02)
+
+(defpackage #:advent-of-code-2022.day03
+  (:nicknames #:aoc2022.day03)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day03)
