@@ -4,13 +4,15 @@
   (:nicknames #:aoc.util #:util)
   (:use #:cl)
   (:local-nicknames (#:a #:alexandria)
-                    (#:lt #:local-time))
+                    (#:lt #:local-time)
+                    (#:re #:cl-ppcre))
   (:export
    :transpose
    :histogram
    :split-lines
    :split-string-on-indices
    :list->groups
+   :parse-ranges
    :square
    :^2
    :cube
@@ -297,3 +299,9 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2022.day03)
+
+(defpackage #:advent-of-code-2022.day04
+  (:nicknames #:aoc2022.day04)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day04)

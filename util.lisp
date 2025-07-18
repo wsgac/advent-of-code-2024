@@ -188,6 +188,14 @@ all of them into a list."
 #+(or)
 (parse-integers "0-1-2-3-4-5" :sep '(#\-))
 
+(defun parse-ranges (string)
+  "Parse `string` looking for integer ranges of the form a-b."
+  (let (pairs)
+   (re:do-register-groups (from to)
+       ("(\\d+)-(\\d+)" string)
+     (push (cons (parse-integer from) (parse-integer to)) pairs))
+    pairs))
+
 (defun concat-numbers (a b)
   (if (zerop b) (* 10 a)
       (+ (* a (expt 10 (floor (1+ (log b 10))))) b)))
