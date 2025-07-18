@@ -22,6 +22,13 @@
     :when common
       :sum (priority (first common))))
 
+(defun problem-1-parallel (&key (input *input-part-1-test*))
+  (flet ((pair-to-priority (pair)
+           (let ((common (apply #'find-common-chars pair)))
+             (if common (priority (first common)) 0))))
+    (let ((lparallel:*kernel* (lparallel:make-kernel 16)))
+     (lparallel:pmap-reduce #'pair-to-priority #'+ (parse-input input)))))
+
 (defun parse-input-2 (input)
   (util:split-lines input))
 
@@ -31,6 +38,13 @@
     :for common := (find-common-chars r1 r2 r3)
     :when common
       :sum (priority (first common))))
+
+(defun problem-2-parallel (&key (input *input-part-2-test*))
+  (flet ((group-to-priority (group)
+           (let ((common (apply #'find-common-chars group)))
+             (if common (priority (first common)) 0))))
+    (let ((lparallel:*kernel* (lparallel:make-kernel 16)))
+     (lparallel:pmap-reduce #'group-to-priority #'+ (util:list->groups (parse-input-2 input) 3)))))
 
 (defparameter *input-part-1-test*
   "vJrwpWtwJgWrhcsFMMfFFhFp

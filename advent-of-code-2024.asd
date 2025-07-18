@@ -11,6 +11,7 @@
                :array-operations
                :cl-ppcre
                :lisp-stat
+               :lparallel
                :local-time
                :trivia
                :str

@@ -54,6 +54,18 @@ collision. That defaults to a newest value selector."
 #+(or)
 (merge-plists '((:a 1 :b 2) (:b 20 :c 30)) :value-selector #'+)
 
+(defun list->groups (list n)
+  "Divide `list` into groups of (at most) `n` elements."
+  (loop
+    :for i :from 0
+    :with group := nil
+    :for el :in list
+    :do (push el group)
+    :when (and (plusp i) (zerop (mod (1+ i) n)))
+      :collect (nreverse group) :into groups
+      :and :do (setf group nil)
+    :finally (return (append groups (when group (list group))))))
+
 ;;;;;;;;;;;;;;;;;;;
 ;; Combinatorics ;;
 ;;;;;;;;;;;;;;;;;;;

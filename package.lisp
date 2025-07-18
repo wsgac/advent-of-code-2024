@@ -10,6 +10,7 @@
    :histogram
    :split-lines
    :split-string-on-indices
+   :list->groups
    :square
    :^2
    :cube
