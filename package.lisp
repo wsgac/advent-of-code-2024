@@ -305,3 +305,9 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2022.day04)
+
+(defpackage #:advent-of-code-2022.day05
+  (:nicknames #:aoc2022.day05)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day05)
