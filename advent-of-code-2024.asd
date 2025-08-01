@@ -34,7 +34,8 @@
                  (:file "day05")
                  (:file "day06")
                  (:file "day07")
-                 (:file "day08")))
+                 (:file "day08")
+                 (:file "day09")))
                ;; AoC 2023 recap
                (:module "2023"
                 :components
