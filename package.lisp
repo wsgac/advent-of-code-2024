@@ -43,7 +43,8 @@
    :priority-queue
    :pq-push
    :pq-pop
-   :pq-empty?))
+   :pq-empty?
+   :character-list))
 
 (defparameter *package-local-nicknames*
   '(("a" . "alexandria")
@@ -335,3 +336,15 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2022.day09)
+
+(defpackage #:advent-of-code-2022.day10
+  (:nicknames #:aoc2022.day10)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day10)
+
+(defpackage #:sudoku
+  ;; (:nicknames #:aoc2022.day10)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:sudoku)

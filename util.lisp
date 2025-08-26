@@ -46,6 +46,7 @@ collision. That defaults to a newest value selector."
 #+(or)
 (merge-plists '((:a 1 :b 2) (:b 20 :c 30)))
 #+(or)
+
 (merge-plists '((:a 1 :b 20 :c 300) (:a 10 :b 200 :c 3) (:a 100 :b 2 :c 30))
               :value-selector #'max)
 #+(or)
@@ -65,6 +66,16 @@ collision. That defaults to a newest value selector."
       :collect (nreverse group) :into groups
       :and :do (setf group nil)
     :finally (return (append groups (when group (list group))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Strings & Characters ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun list-of-chars (lst)
+  (every #'characterp lst))
+
+(deftype character-list ()
+  '(and list (satisfies list-of-chars)))
 
 ;;;;;;;;;;;;;;;;;;;
 ;; Combinatorics ;;

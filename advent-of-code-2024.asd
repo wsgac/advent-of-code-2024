@@ -14,6 +14,7 @@
                :lparallel
                :local-time
                :trivia
+               :sb-concurrency
                :str
                :serapeum
                :zpng
@@ -22,8 +23,15 @@
   :components ((:file "package")
                (:file "onlisp")
 	       (:file "util")
-               (:file "misc")
-               (:file "sicp")
+               ;; Miscellaneous
+               (:module "misc"
+                :components
+                ((:file "sudoku")
+                 (:file "misc")
+                 (:file "sicp")))
+               (:module "explorations"
+                :components
+                ((:file "a-star")))
                ;; AoC 2022 recap
                (:module "2022"
                 :components
@@ -35,7 +43,8 @@
                  (:file "day06")
                  (:file "day07")
                  (:file "day08")
-                 (:file "day09")))
+                 (:file "day09")
+                 (:file "day10")))
                ;; AoC 2023 recap
                (:module "2023"
                 :components
