@@ -31,7 +31,8 @@
                  (:file "sicp")))
                (:module "explorations"
                 :components
-                ((:file "a-star")))
+                ((:file "a-star")
+                 (:file "over-the-wire-natas-15")))
                ;; AoC 2022 recap
                (:module "2022"
                 :components
