@@ -525,6 +525,24 @@ have a fill pointer and be adjustable."
   (vector-push-n v 10 5)
   v)
 
+;;;;;;;;;;;;;
+;; Streams ;;
+;;;;;;;;;;;;;
+
+(defun %with-output-to-multiple% (stream-var files file-streams body)
+  (if (null files)
+      `(let ((,stream-var (make-broadcast-stream ,@file-streams)))
+         (progn ,@body))
+      (let ((s (gensym)))
+        `(with-open-file (,s ,(first files) :direction :output)
+           ,(%with-output-to-multiple% stream-var (rest files) (cons s file-streams) body)))))
+
+(defmacro with-output-to-multiple (stream-var (&rest files) &body body)
+  "Create a broadcast stream connected to the output streams of `files`
+and bind it to `stream-var`. Execute `body` in the context of those
+bindings."
+  (%with-output-to-multiple% stream-var files nil body))
+
 ;;;;;;;;;;;;;;;;;
 ;; Odds & Ends ;;
 ;;;;;;;;;;;;;;;;;
