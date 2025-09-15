@@ -44,7 +44,9 @@
    :pq-push
    :pq-pop
    :pq-empty?
-   :character-list))
+   :character-list
+   :file-at-once
+   :with-output-to-multiple))
 
 (defparameter *package-local-nicknames*
   '(("a" . "alexandria")

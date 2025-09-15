@@ -543,6 +543,26 @@ and bind it to `stream-var`. Execute `body` in the context of those
 bindings."
   (%with-output-to-multiple% stream-var files nil body))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Files & Filesystems ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun file-at-once (filespec &rest open-args)
+  (with-open-stream (stream (apply #'open filespec
+                                   open-args))
+    (let* ((buffer
+             (make-array (file-length stream)
+                         :element-type
+                         (stream-element-type stream)
+                         :fill-pointer t))
+           (position (read-sequence buffer stream)))
+      (setf (fill-pointer buffer) position)
+      buffer)))
+
+(defun (setf file-at-once) (file-contents filespec)
+  (with-open-stream (stream (open filespec :direction :output :if-exists :supersede))
+    (write-sequence file-contents stream)))
+
 ;;;;;;;;;;;;;;;;;
 ;; Odds & Ends ;;
 ;;;;;;;;;;;;;;;;;
