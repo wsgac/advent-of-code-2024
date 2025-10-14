@@ -32,7 +32,10 @@
                (:module "explorations"
                 :components
                 ((:file "a-star")
-                 (:file "over-the-wire-natas")))
+                 (:file "over-the-wire-natas")
+                 (:module "hdl"
+                  :components
+                  ((:file "hdl")))))
                ;; AoC 2022 recap
                (:module "2022"
                 :components

@@ -233,6 +233,14 @@
 
 (apply-local-nicknames '#:advent-of-code-2024.day25)
 
+;; AoC 2025
+
+(defpackage #:advent-of-code-2025.day01
+  (:nicknames #:aoc2025.day01)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2025.day01)
+
 ;; AoC 2023 recap - renewed attempts at solving some problems from 2023
 
 (defpackage #:advent-of-code-2023.day01
@@ -350,3 +358,8 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:sudoku)
+
+(defpackage #:hdl
+  (:use #:cl)
+  (:local-nicknames (#:a #:alexandria)
+                    (#:ser #:serapeum)))
