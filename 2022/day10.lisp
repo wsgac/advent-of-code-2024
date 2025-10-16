@@ -45,6 +45,8 @@
       :else
         :do (write-char #\. s))))
 
+;; TODO: Think about some sort of primitive OCR
+
 ;; Data
 
 (defparameter *input-part-1-test-1*

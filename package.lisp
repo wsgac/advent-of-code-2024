@@ -353,6 +353,12 @@
 
 (apply-local-nicknames '#:advent-of-code-2022.day10)
 
+(defpackage #:advent-of-code-2022.day11
+  (:nicknames #:aoc2022.day11)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day11)
+
 (defpackage #:sudoku
   ;; (:nicknames #:aoc2022.day10)
   (:use #:cl #:util))
