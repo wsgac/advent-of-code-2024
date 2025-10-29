@@ -202,7 +202,7 @@ noop
 noop
 noop")
 
-(defparameter *input-part-2-test* *input-part-1-test*)
+;; (defparameter *input-part-2-test* *input-part-1-test*)
 
 (defparameter *input*
   "noop

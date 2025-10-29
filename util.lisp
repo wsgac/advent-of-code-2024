@@ -385,7 +385,8 @@ values to `item`. For each such iteration execute `body`."
     :initform nil
     :accessor heap)
    (vec-size
-    :initarg :vec-size)
+    :initarg :vec-size
+    :initform 50)
    (cmp
     :initarg :cmp
     :accessor cmp)

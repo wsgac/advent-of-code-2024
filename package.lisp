@@ -41,6 +41,7 @@
    :vector-push-n
    ;; Priority Queue
    :priority-queue
+   :priority-queue-list
    :pq-push
    :pq-pop
    :pq-empty?
@@ -358,6 +359,12 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2022.day11)
+
+(defpackage #:advent-of-code-2022.day12
+  (:nicknames #:aoc2022.day12)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day12)
 
 (defpackage #:sudoku
   ;; (:nicknames #:aoc2022.day10)
