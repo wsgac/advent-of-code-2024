@@ -339,7 +339,22 @@ values to `item`. For each such iteration execute `body`."
   (array-loop (arr (d1 d2 d3) :item el)
     (format t "Dimension 1: ~a Dimension 2: ~a Dimension 3: ~a Item: ~a~%" d1 d2 d3 el)))
 
-;; Priority Queue - BEGIN
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Priority Queue - BEGIN ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Priority Queue Protocol
+
+(defgeneric pq-push (pq item)
+  (:documentation "Enqueue ITEM in priority queue PQ"))
+(defgeneric pq-pop (pq)
+  (:documentation "Pop the next item from priority queue PQ"))
+(defgeneric pq-peek (pq)
+  (:documentation "Look up the next item in priority queue PQ without actually dequeuing it"))
+(defgeneric pq-empty? (pq)
+  (:documentation "Have all items been removed from priority queue PQ?"))
+
+;; List-based Implementation
 
 (defclass priority-queue-list ()
   ((queue
@@ -363,12 +378,15 @@ values to `item`. For each such iteration execute `body`."
 (defmethod pq-pop ((pq priority-queue-list))
   (with-slots (queue cmp key sorted) pq
     (unless sorted
-      (setf queue (sort queue cmp :key key)
+      (setf queue (stable-sort (copy-list queue) cmp :key key)
             sorted t))
     (pop queue)))
 
 (defmethod pq-empty? ((pq priority-queue-list))
   (endp (queue pq)))
+
+(defmethod pq-peek ((pq priority-queue-list))
+  (first (queue pq)))
 
 #+(or)
 (let ((q (make-instance 'priority-queue-list :cmp #'> :key #'second))
@@ -379,43 +397,87 @@ values to `item`. For each such iteration execute `body`."
     collect (pq-pop q)
     until (pq-empty? q)))
 
-(defclass priority-queue ()
-  ((heap
-    :initarg :heap
-    :initform nil
-    :accessor heap)
-   (vec-size
-    :initarg :vec-size
-    :initform 50)
+(defclass priority-queue-heap ()
+  ((data
+    :initform (make-array 0 :adjustable t :fill-pointer 0)
+    :accessor data
+    :documentation "Vector storing heap elements.")
    (cmp
     :initarg :cmp
-    :accessor cmp)
+    :reader cmp
+    :documentation "Comparison predicate (< for min-heap).")
    (key
     :initarg :key
-    :accessor key)))
+    :reader key
+    :initform #'identity
+    :documentation "Key function applied before comparison.")))
 
-(defmethod initialize-instance :after ((pq priority-queue) &key &allow-other-keys)
-  (with-slots (heap cmp key vec-size) pq
-    (let ((h (serapeum:make-heap :key key :test cmp :size vec-size)))
-      (unless (endp heap)
-        (dolist (item heap)
-          (serapeum:heap-insert h item)))
-      (setf heap h))))
+(defun %heap-parent (i) (floor (1- i) 2))
+(defun %heap-left (i) (+ (* 2 i) 1))
+(defun %heap-right (i) (+ (* 2 i) 2))
 
-(defmethod pq-push ((pq priority-queue) item)
-  (with-slots (heap) pq
-    (serapeum:heap-insert heap item)))
+(defmethod pq-push ((pq priority-queue-heap) item)
+  (with-slots (data cmp key) pq
+    (vector-push-extend item data)
+    (let ((i (1- (fill-pointer data))))
+      (loop
+        :while (plusp i)
+        :for parent := (%heap-parent i)
+        :while (funcall cmp
+                        (funcall key (aref data i))
+                        (funcall key (aref data parent)))
+        :do (rotatef (aref data i) (aref data parent))
+            (setf i parent))))
+  pq)
 
-(defmethod pq-pop ((pq priority-queue))
-  (with-slots (heap) pq
-    (serapeum:heap-extract-maximum heap)))
+(defmethod pq-peek ((pq priority-queue-heap))
+  (with-slots (data) pq
+    (when (zerop (fill-pointer data))
+      (error "Priority queue is empty."))
+    (aref data 0)))
 
-(defmethod pq-empty? ((pq priority-queue))
-  (with-slots (heap) pq
-    (a:emptyp (serapeum::heap-vector heap))))
+(defmethod pq-pop ((pq priority-queue-heap))
+  (with-slots (data cmp key) pq
+    (when (zerop (fill-pointer data))
+      (error "Priority queue is empty."))
+    (let* ((last-index (1- (fill-pointer data)))
+           (root (aref data 0)))
+      ;; Move last element to root
+      (decf (fill-pointer data))
+      (unless (zerop (fill-pointer data))
+        (setf (aref data 0) (aref data last-index))
+        ;; Bubble down
+        (loop with i = 0
+              for l = (%heap-left i)
+              for r = (%heap-right i)
+              for smallest = nil
+              while (< l (fill-pointer data))
+              do (setf smallest
+                       (if (and (< r (fill-pointer data))
+                                (funcall cmp
+                                         (funcall key (aref data r))
+                                         (funcall key (aref data l))))
+                           r
+                           l))
+                 (when (funcall cmp
+                                (funcall key (aref data smallest))
+                                (funcall key (aref data i)))
+                   (rotatef (aref data i) (aref data smallest))
+                   (setf i smallest)
+                   (setf l (%heap-left i)
+                         r (%heap-right i)))
+                 (unless (and (< l (fill-pointer data))
+                              (funcall cmp
+                                       (funcall key (aref data l))
+                                       (funcall key (aref data i))))
+                   (return))))
+      root)))
+
+(defmethod pq-empty? ((pq priority-queue-heap))
+  (zerop (fill-pointer (data pq))))
 
 #+(or)
-(let ((q (make-instance 'priority-queue :cmp #'> :key #'second))
+(let ((q (make-instance 'priority-queue-heap :cmp #'> :key #'second))
       (items '((a 1) (b 2) (c 3) (d 4) (e 5))))
   (dolist (i (a:shuffle items))
     (pq-push q i))
@@ -424,7 +486,7 @@ values to `item`. For each such iteration execute `body`."
     until (pq-empty? q)))
 
 #+(or)
-(let ((q (make-instance 'priority-queue :cmp #'< :key #'second))
+(let ((q (make-instance 'priority-queue-heap :cmp #'< :key #'second))
       (items '((a 1) (b 2) (c 3) (d 4) (e 5))))
   (dolist (i (a:shuffle items))
     (pq-push q i))

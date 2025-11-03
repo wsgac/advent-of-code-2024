@@ -41,6 +41,7 @@
    :vector-push-n
    ;; Priority Queue
    :priority-queue
+   :priority-queue-heap
    :priority-queue-list
    :pq-push
    :pq-pop

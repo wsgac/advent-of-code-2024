@@ -33,10 +33,12 @@
 
 (defun neighbors (arr p)
   (loop
-    :with (px . py) := p
-    :for (dx . dy) :in '((0 . 1) (1 . 0) (0 . -1) (-1 . 0))
-    :when (ignore-errors (aref arr (+ px dx) (+ py dy)))
-      :collect (cons (+ px dx) (+ py dy))))
+    :with (pr . pc) := p
+    :with curr := (aref arr pr pc)
+    :for (dr . dc) :in '((0 . 1) (1 . 0) (0 . -1) (-1 . 0))
+    :when (ignore-errors (let ((neighbor (aref arr (+ pr dr) (+ pc dc))))
+                           (<= (- neighbor curr) 1)))
+      :collect (cons (+ pr dr) (+ pc dc))))
 
 (defun cost (arr current next)
   (let ((d (- (aref arr (car next) (cdr next))
@@ -53,7 +55,7 @@
     :finally (return (nreverse path))))
 
 (defun a* (arr start end)
-  (let ((frontier (make-instance 'u:priority-queue-list
+  (let ((frontier (make-instance 'u:priority-queue-heap
                                     :cmp #'< :key #'second))
            (came-from (make-hash-table :test #'equal))
            (cost-so-far (make-hash-table :test #'equal)))
@@ -63,6 +65,7 @@
                            (setf (gethash start cost-so-far) 0))
          :while (and (not (pq-empty? frontier))
                      (not (equal current end)))
+         :for step :from 0 :below (array-total-size arr)
          :for current := (first (pq-pop frontier))
          ;; :do (format t "~%~a" current)
          :when (equal current end)
@@ -71,7 +74,7 @@
                :for next :in (neighbors arr current)
                :for new-cost := (+ (gethash current cost-so-far)
                                    (cost arr current next))
-               :when (or (not (gethash next cost-so-far))
+               :when (or (not (nth-value 1 (gethash next cost-so-far)))
                          (< new-cost (gethash next cost-so-far)))
                  :do (progn (setf (gethash next cost-so-far) new-cost)
                             (pq-push frontier (list next
@@ -91,6 +94,33 @@
         (push (cons row col) s)))
     s))
 
+(defun neighbors-inv (arr p)
+  (loop
+    :with (pr . pc) := p
+    :with curr := (aref arr pr pc)
+    :for (dr . dc) :in '((0 . 1) (1 . 0) (0 . -1) (-1 . 0))
+    :when (ignore-errors (let ((neighbor (aref arr (+ pr dr) (+ pc dc))))
+                           (>= (- neighbor curr) -1)))
+      :collect (cons (+ pr dr) (+ pc dc))))
+
+(defun bfs (arr start)
+  (flet ((at-zero (p)
+           (zerop (aref arr (car p) (cdr p)))))
+   (let ((frontier (sb-concurrency:make-queue))
+         (came-from (make-hash-table :test #'equal)))
+     (loop
+       :initially (progn (sb-concurrency:enqueue start frontier)
+                         (setf (gethash start came-from) nil))
+       :while (not (sb-concurrency:queue-empty-p frontier))
+       :for current := (sb-concurrency:dequeue frontier)
+       :do (loop
+             :for next :in (neighbors-inv arr current)
+             :when (not (nth-value 1 (gethash next came-from)))
+               :do (sb-concurrency:enqueue next frontier)
+               :and :do (setf (gethash next came-from) current))
+       :when (at-zero current)
+         :do (return-from bfs (path start current came-from))))))
+
 (defun problem-2 (&key (input *input-part-1-test*))
   (tr:match (parse-input input)
     ((tr:plist :array arr :end end)
@@ -99,13 +129,14 @@
      ;;           (common-lisp:mapcar (lambda (s) (let ((res (a* arr s end)))
      ;;                                      (length res)))
      ;;                        (find-starting-points arr end 20))))
-     (loop
-       :with p
-       :for s :in (find-starting-points arr end 15)
-       :do (format t "~%Start: ~a " s)
-       :do (setf p (a* arr s end))
-       :do (format t "Result: ~a~%" (length p))
-       :minimize (length p))
+     ;; (loop
+     ;;   :with p
+     ;;   :for s :in (find-starting-points arr end 15)
+     ;;   :do (format t "~%Start: ~a " s)
+     ;;   :do (setf p (a* arr s end))
+     ;;   :do (format t "Result: ~a~%" (length p))
+     ;;   :minimize (length p))
+     (length (bfs arr end))
      )))
 
 ;; Data
