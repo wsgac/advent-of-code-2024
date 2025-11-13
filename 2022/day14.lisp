@@ -21,7 +21,14 @@
     :while p2
     :do (populate arr p1 p2)))
 
-(defun parse-input (input)
+(defun render-floor (arr)
+  (loop
+    :with row := (1- (array-dimension arr 0))
+    :for col :below (array-dimension arr 1)
+    :do (setf (aref arr row col) #\#)
+    :finally (return arr)))
+
+(defun parse-input (input &key with-floor)
   (loop
     :with rows := (u:split-lines input)
     :for row :in rows
@@ -33,13 +40,15 @@
     :maximize (apply #'max (mapcar #'second row-pairs)) :into max-row
     :collect row-pairs :into segments
     :finally (return (loop
-                       :with arr := (make-array (list (1+ max-row)
-                                                      (1+ max-col))
+                       :with arr := (make-array (list (+ 1 max-row (if with-floor 2 0))
+                                                      (+ 1 max-col (if with-floor
+                                                                       (+ 4 (* 2 max-row))
+                                                                       0)))
                                                 :initial-element #\.
                                                 :element-type 'character)
                        :for rock-segment :in segments
                        :do (render-segment arr rock-segment)
-                       :finally (return arr)))))
+                       :finally (return (if with-floor (render-floor arr) arr))))))
 
 (defun step-sand (arr pos)
   (destructuring-bind (row . col) pos
@@ -82,7 +91,7 @@
     :do (multiple-value-setq (arr new-pos) (step-sand arr pos))
     :when (equal pos new-pos)
       ;; There was change
-      :do (return (values arr t))
+      :do (return (values arr (not (equal new-pos start))))
     :when (null new-pos)
       ;; No more change
       :do (return (values arr nil))))
@@ -98,7 +107,14 @@
     :finally (return i)))
 
 (defun problem-2 (&key (input *input-part-1-test*))
-  nil)
+  (loop
+    :with arr := (parse-input input :with-floor t)
+    :with change := t
+    :for i :from 0
+    :do (multiple-value-setq (arr change)
+          (move-sand arr '(0 . 500)))
+    :while change
+    :finally (return (1+ i))))
 
 ;; Data
 
