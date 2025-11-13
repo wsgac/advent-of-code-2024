@@ -33,6 +33,7 @@
    :array-loop
    :2d-array->string
    :2d-array->png
+   :within-array
    :vec+
    :aref*
    :manhattan
@@ -372,6 +373,12 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2022.day13)
+
+(defpackage #:advent-of-code-2022.day14
+  (:nicknames #:aoc2022.day14)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day14)
 
 (defpackage #:sudoku
   ;; (:nicknames #:aoc2022.day10)

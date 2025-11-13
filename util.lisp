@@ -275,6 +275,33 @@ all of them into a list."
 ;; Arrays ;;
 ;;;;;;;;;;;;
 
+(defun within-array (arr &key (row nil rowp) (col nil colp))
+  (and (if rowp (<= 0 row (1- (array-dimension arr 0))) t)
+       (if colp (<= 0 col (1- (array-dimension arr 1))) t)))
+
+#+(or)
+(let ((arr (make-array '(3 3))))
+  (list
+   ;; rows
+   (within-array arr :row -1)
+   (within-array arr :row -0)
+   (within-array arr :row 2)
+   (within-array arr :row 3)
+   ;; cols
+   (within-array arr :col -1)
+   (within-array arr :col -0)
+   (within-array arr :col 2)
+   (within-array arr :col 3)
+   ;; mixed
+   (within-array arr :row -1 :col -1)
+   (within-array arr :row 0 :col -1)
+   (within-array arr :row -1 :col 0)
+   (within-array arr :row 0 :col 0)
+   (within-array arr :row 2 :col 2)
+   (within-array arr :row 3 :col 2)
+   (within-array arr :row 2 :col 3)
+   (within-array arr :row 3 :col 3)))
+
 (defun aref* (array indices)
   "Lookup the contents of `array` under indices contained in
 `indices`. The length of `indices` must be the same as the rank of
@@ -299,6 +326,16 @@ coordinates in the form (row, column). Otherwise, return NIL."
 	   for c from 0 below d2
 	   when (equal item (aref array r c))
 	     do (return-from position-in-2d-array (list r c))))))
+
+(defun 2d-array->string (arr)
+  (with-output-to-string (s)
+    (loop
+      :for row :below (array-dimension arr 0)
+      :do (loop
+            :for col :below (array-dimension arr 1)
+            :do (write-char (aref arr row col) s))
+      :when (< row (1- (array-dimension arr 0)))
+        :do (terpri s))))
 
 (defun parse-string-into-array (data &key adjustable)
   "Parse DATA string into a 2-dimensional array."
