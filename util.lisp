@@ -699,3 +699,45 @@ bindings."
             for c2 across *alphabet*
             do (format s "~a" (country->flag (format nil "~c~c" c1 c2))))
        do (terpri s)))))
+
+;;;;;;;;;;
+;; Fset ;;
+;;;;;;;;;;
+
+(define-condition queue-empty (error) ())
+
+(defclass fset-queue ()
+  ((items
+     :initform (fset:empty-seq))
+   (empty-condition
+    :initarg :empty-condition
+    :initform 'queue-empty)))
+
+(defmethod enqueue ((q fset-queue) item)
+  (with-slots (items) q
+    (setf items (fset:with-first items item))))
+
+(defmethod dequeue ((q fset-queue))
+  (with-slots (items empty-condition) q
+    (multiple-value-bind (last lastp) (fset:last items)
+      (if lastp
+          (progn
+            (setf items (fset:less-last items))
+            last)
+          (error empty-condition)))))
+
+(defmethod peek ((q fset-queue))
+  (with-slots (items empty-condition) q
+    (multiple-value-bind (last lastp) (fset:last items)
+      (if lastp
+          last
+          (error (make-condition empty-condition))))))
+
+
+(defmethod size ((q fset-queue))
+  (with-slots (items) q
+    (fset:size items)))
+
+(defmethod empty? ((q fset-queue))
+  (with-slots (items) q
+    (fset:empty? items)))

@@ -49,7 +49,13 @@
    :pq-empty?
    :character-list
    :file-at-once
-   :with-output-to-multiple))
+   :with-output-to-multiple
+   ;; fmap-queue
+   :fset-queue
+   :enqueue
+   :dequeue
+   :size
+   :empty?))
 
 (defparameter *package-local-nicknames*
   '(("a" . "alexandria")
@@ -334,13 +340,13 @@
 
 (defpackage #:advent-of-code-2022.day07
   (:nicknames #:aoc2022.day07)
-  (:use #:cl #:util))
+  (:use #:cl))
 
 (apply-local-nicknames '#:advent-of-code-2022.day07)
 
 (defpackage #:advent-of-code-2022.day08
   (:nicknames #:aoc2022.day08)
-  (:use #:cl #:util))
+  (:use #:cl))
 
 (apply-local-nicknames '#:advent-of-code-2022.day08)
 
@@ -380,11 +386,22 @@
 
 (apply-local-nicknames '#:advent-of-code-2022.day14)
 
+(defpackage #:advent-of-code-2022.day15
+  (:nicknames #:aoc2022.day15)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day15)
+
 (defpackage #:sudoku
   ;; (:nicknames #:aoc2022.day10)
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:sudoku)
+
+(defpackage #:m3u-downloader
+  (:use #:cl))
+
+(apply-local-nicknames '#:m3u-downloader)
 
 (defpackage #:hdl
   (:use #:cl)

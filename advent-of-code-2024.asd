@@ -18,7 +18,7 @@
                :str
                :serapeum
                :zpng
-               ;; :fset
+               :fset
 	       )
   :components ((:file "package")
                (:file "onlisp")
@@ -35,7 +35,8 @@
                  (:file "over-the-wire-natas")
                  (:module "hdl"
                   :components
-                  ((:file "hdl")))))
+                  ((:file "hdl")))
+                 (:file "m3u-downloader")))
                ;; AoC 2022 recap
                (:module "2022"
                 :components
@@ -52,7 +53,8 @@
                  (:file "day11")
                  (:file "day12")
                  (:file "day13")
-                 (:file "day14")))
+                 (:file "day14")
+                 (:file "day15")))
                ;; AoC 2023 recap
                (:module "2023"
                 :components
