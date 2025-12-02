@@ -6,6 +6,9 @@
     :collect (util:parse-integers range :sep '(#\-))))
 
 (defun invalid? (num)
+  "Checks whether NUM is composed of the same sequence of digits repeated
+twice. This only has a chance of being true for numbers with an even
+number of digits."
   (let ((ndigits (util:digit-count num)))
     (and (evenp ndigits)
          (multiple-value-bind (l r)
@@ -21,15 +24,23 @@
              :sum num)))
 
 (defun generated-by-sub? (num factor)
+  "Check whether NUM can be expressed as 2 or more sequences of digits of
+length FACTOR."
   (loop
     :with d := (expt 10 factor)
-    :for n := num :then q
+    :for n := (truncate num d) :then (truncate n d)
     :while (plusp n)
-    :for (q r) := (multiple-value-list (truncate n d))
-    :collect r :into rems
-    :finally (return (= 1 (length (delete-duplicates rems))))))
+    :for prev := (rem num d) :then curr
+    :for curr := (rem n d)
+    :unless (= curr prev)
+      :do (return nil)
+    :finally (return t)
+    ))
 
 (defun invalid>=2? (num)
+  "Checks whether NUM can be composed of a sequence of digits repeated
+twice or more. It follows that the only viable sequence lengths are
+factors of the number of digits of NUM, except that number itself."
   (loop
     :for factor :in (cons 1 (util:factors (util:digit-count num)))
     :when (generated-by-sub? num factor)
