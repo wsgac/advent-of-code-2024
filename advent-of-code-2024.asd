@@ -97,4 +97,5 @@
                ;; AoC 2025
                (:module "2025"
                 :components
-                ((:file "day01")))))
+                ((:file "day01")
+                 (:file "day02")))))

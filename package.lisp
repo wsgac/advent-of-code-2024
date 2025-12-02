@@ -55,7 +55,9 @@
    :enqueue
    :dequeue
    :size
-   :empty?))
+   :empty?
+   :digit-count
+   :factors))
 
 (defparameter *package-local-nicknames*
   '(("a" . "alexandria")
@@ -99,6 +101,12 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2025.day01)
+
+(defpackage #:advent-of-code-2025.day02
+  (:nicknames #:aoc2025.day02)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2025.day02)
 
 ;; 2024
 

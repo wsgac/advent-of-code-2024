@@ -271,6 +271,17 @@ all of them into a list."
   "Combine numbers A and B by juxtaposition."
   (+ (* a (expt 10 (ceiling (log b 10)))) b))
 
+(defun digit-count (x)
+  "Return the number of digits in X"
+  (1+ (floor (log x 10))))
+
+(defun factors (x)
+  ""
+  (loop
+    :for f :from 2 :to (/ x 2)
+    :when (zerop (rem x f))
+      :collect f))
+
 ;;;;;;;;;;;;
 ;; Arrays ;;
 ;;;;;;;;;;;;
