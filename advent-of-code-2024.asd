@@ -98,4 +98,5 @@
                (:module "2025"
                 :components
                 ((:file "day01")
-                 (:file "day02")))))
+                 (:file "day02")
+                 (:file "day03")))))

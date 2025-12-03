@@ -94,20 +94,6 @@
 
 (apply-local-nicknames '#:advent-of-code-2024.sicp)
 
-;; 2025
-
-(defpackage #:advent-of-code-2025.day01
-  (:nicknames #:aoc2025.day01)
-  (:use #:cl #:util))
-
-(apply-local-nicknames '#:advent-of-code-2025.day01)
-
-(defpackage #:advent-of-code-2025.day02
-  (:nicknames #:aoc2025.day02)
-  (:use #:cl #:util))
-
-(apply-local-nicknames '#:advent-of-code-2025.day02)
-
 ;; 2024
 
 (defpackage #:advent-of-code-2024.day01
@@ -409,6 +395,26 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2022.day15)
+
+;; 2025
+
+(defpackage #:advent-of-code-2025.day01
+  (:nicknames #:aoc2025.day01)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2025.day01)
+
+(defpackage #:advent-of-code-2025.day02
+  (:nicknames #:aoc2025.day02)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2025.day02)
+
+(defpackage #:advent-of-code-2025.day03
+  (:nicknames #:aoc2025.day03)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2025.day03)
 
 (defpackage #:sudoku
   ;; (:nicknames #:aoc2022.day10)
