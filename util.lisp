@@ -762,9 +762,14 @@ bindings."
 
 (defparameter *problem-dir* "problem-data")
 
+(defun get-current-system-name ()
+  "Get the name of the ASDF system currently being loaded."
+  (let ((asd-path #p"*.asd"))
+    (pathname-name (first (directory asd-path)))))
+
 (defun get-problem-data (year day)
   (let ((path (asdf:system-relative-pathname
-               "advent-of-code-2024"
+               (get-current-system-name)
                (format nil "~a/~d/~d/input" *problem-dir* year day))))
     (unless (uiop:file-exists-p path)
       (uiop:ensure-all-directories-exist
@@ -777,7 +782,7 @@ bindings."
   (let* ((url (format nil "https://adventofcode.com/~d/day/~d/input"
                       year day))
          (cookie-path (asdf:system-relative-pathname
-                       "advent-of-code-2024"
+                       (get-current-system-name)
                        (format nil "~a/cookie" *problem-dir*)))
          (cookie (restart-case (uiop:read-file-string cookie-path)
                    (use-cookie (new-cookie)
@@ -789,6 +794,4 @@ bindings."
                                                :if-does-not-exist :create)
                        (princ new-cookie s)
                        new-cookie)))))
-    (dex:get url
-             :headers `(("Cookie" . ,cookie))
-             :want-stream t)))
+    (dex:get url :headers `(("Cookie" . ,cookie)) :want-stream t)))
