@@ -7,57 +7,58 @@
                     (#:lt #:local-time)
                     (#:re #:cl-ppcre))
   (:export
-   :transpose
-   :histogram
-   :split-lines
-   :split-string-on-indices
-   :list->groups
-   :parse-ranges
-   :square
+   :2d-array->png
+   :2d-array->string
    :^2
-   :cube
    :^3
+   :aref*
+   :array-loop
+   :bron-kerbosch
+   :char-arr->num-arr
+   :choose-combinations-not-replacing
+   :choose-combinations-replacing
+   :compose-n
+   :concat-numbers
+   :cube
+   :digit-count
+   :digits->number
+   :extract-integers
+   :factors
+   :get-problem-data
+   :histogram
    :join-numbers
-   :position-in-2d-array
+   :list->groups
+   :manhattan
+   :merge-plists
+   :number->digits
+   :parse-integers
+   :parse-ranges
    :parse-string-into-array
    :parse-string-into-list
-   :merge-plists
-   :parse-integers
-   :choose-combinations-replacing
-   :choose-combinations-not-replacing
-   :concat-numbers
-   :number->digits
-   :digits->number
-   :char-arr->num-arr
-   :extract-integers
-   :array-loop
-   :2d-array->string
-   :2d-array->png
-   :within-array
+   :position-in-2d-array
+   :split-lines
+   :split-string-on-indices
+   :square
    :vec+
-   :aref*
-   :manhattan
-   :bron-kerbosch
-   :compose-n
    :vector-push-n
+   :within-array
+   :transpose
    ;; Priority Queue
+   :character-list
+   :file-at-once
+   :pq-empty?
+   :pq-pop
+   :pq-push
    :priority-queue
    :priority-queue-heap
    :priority-queue-list
-   :pq-push
-   :pq-pop
-   :pq-empty?
-   :character-list
-   :file-at-once
    :with-output-to-multiple
    ;; fmap-queue
-   :fset-queue
-   :enqueue
    :dequeue
-   :size
    :empty?
-   :digit-count
-   :factors))
+   :enqueue
+   :fset-queue
+   :size))
 
 (defparameter *package-local-nicknames*
   '(("a" . "alexandria")

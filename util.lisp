@@ -752,3 +752,38 @@ bindings."
 (defmethod empty? ((q fset-queue))
   (with-slots (items) q
     (fset:empty? items)))
+
+;;;;;;;;;;;;;;;;;;
+;; Problem Data ;;
+;;;;;;;;;;;;;;;;;;
+
+;; Automate fetching problem data. Store them in a repo-local
+;; directory, placed in .gitignore
+
+(defparameter *problem-dir* "problem-data")
+
+(defun get-problem-data (year day)
+  (let ((path (asdf:system-relative-pathname
+               "advent-of-code-2024"
+               (format nil "~a/~d/~d/input" *problem-dir* year day))))
+    (unless (uiop:file-exists-p path)
+      (uiop:ensure-all-directories-exist
+       (list (uiop:pathname-directory-pathname path)))
+      (a:if-let ((s (fetch-problem-data year day)))
+        (serapeum:write-stream-into-file s path :if-does-not-exist :create)))
+    (string-trim '(#\space #\newline) (uiop:read-file-string path))))
+
+(defun fetch-problem-data (year day)
+  (let* ((url (format nil "https://adventofcode.com/~d/day/~d/input"
+                      year day))
+         (cookie "_ga=GA1.2.272525838.1752769829; _gid=GA1.2.1399545310.1764543772; _ga_MHSNPJKWC7=GS2.2.s1764925438$o53$g1$t1764925443$j55$l0$h0; session=53616c7465645f5fa31ed6cde3fb052e2915e6edb62d13870c9ecbdb7715144c64afe0e6d27e6b8550a4f4d4c7f8e44c4ab60bdac4b30bce5f9f65a6d7e6de38")
+         (cookie-jar (cl-cookie:make-cookie-jar :cookies
+                                                (loop
+                                                  :for cookie-row :in (str:split "; " cookie)
+                                                  :for (cn cv) := (str:split "=" cookie-row)
+                                                  :collect (cl-cookie:make-cookie :name cn
+                                                                                  :value cv))
+                                                )))
+    (dex:get url
+             :headers `(("Cookie" . ,cookie))
+             :want-stream t)))
