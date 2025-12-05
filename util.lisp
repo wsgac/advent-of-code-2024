@@ -776,14 +776,19 @@ bindings."
 (defun fetch-problem-data (year day)
   (let* ((url (format nil "https://adventofcode.com/~d/day/~d/input"
                       year day))
-         (cookie "_ga=GA1.2.272525838.1752769829; _gid=GA1.2.1399545310.1764543772; _ga_MHSNPJKWC7=GS2.2.s1764925438$o53$g1$t1764925443$j55$l0$h0; session=53616c7465645f5fa31ed6cde3fb052e2915e6edb62d13870c9ecbdb7715144c64afe0e6d27e6b8550a4f4d4c7f8e44c4ab60bdac4b30bce5f9f65a6d7e6de38")
-         (cookie-jar (cl-cookie:make-cookie-jar :cookies
-                                                (loop
-                                                  :for cookie-row :in (str:split "; " cookie)
-                                                  :for (cn cv) := (str:split "=" cookie-row)
-                                                  :collect (cl-cookie:make-cookie :name cn
-                                                                                  :value cv))
-                                                )))
+         (cookie-path (asdf:system-relative-pathname
+                       "advent-of-code-2024"
+                       (format nil "~a/cookie" *problem-dir*)))
+         (cookie (restart-case (uiop:read-file-string cookie-path)
+                   (use-cookie (new-cookie)
+                     :report "Enter cookie string manually"
+                     :interactive (lambda ()
+                                    (princ "Cookie: " *query-io*)
+                                    (list (read-line *query-io*)))
+                     (uiop:with-output-file (s cookie-path
+                                               :if-does-not-exist :create)
+                       (princ new-cookie s)
+                       new-cookie)))))
     (dex:get url
              :headers `(("Cookie" . ,cookie))
              :want-stream t)))
