@@ -422,6 +422,12 @@
 
 (apply-local-nicknames '#:advent-of-code-2025.day04)
 
+(defpackage #:advent-of-code-2025.day05
+  (:nicknames #:aoc2025.day05)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2025.day05)
+
 (defpackage #:sudoku
   ;; (:nicknames #:aoc2022.day10)
   (:use #:cl #:util))
