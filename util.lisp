@@ -3,6 +3,13 @@
 (defun transpose (l)
   (apply #'mapcar #'list l))
 
+(defun array-transpose (arr)
+  (let* ((dim (array-dimensions arr))
+         (newarr (make-array (reverse dim))))
+    (array-loop (arr (row col) :item el)
+      (setf (aref newarr col row) el))
+    newarr))
+
 (defun histogram (list)
   "Calculate frequency histogram of LIST in the form of a hash table."
   (loop
@@ -162,6 +169,9 @@ chosen elements. This should produce $|set|^k$ items."
 
 #+(or)
 (choose-combinations-replacing '(a b c d e) 3)
+
+(defun parse-symbols (string)
+  (mapcar #'find-symbol (str:split-omit-nulls " " string)))
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Digits & Numbers ;;
@@ -348,6 +358,17 @@ coordinates in the form (row, column). Otherwise, return NIL."
       :when (< row (1- (array-dimension arr 0)))
         :do (terpri s))))
 
+(defun ensure-rectangular (char-list &key (pad #\space))
+  (let* ((row-lengths (mapcar #'length char-list))
+         (max-length (apply #'max row-lengths)))
+    (loop
+      :for row :in char-list
+      :for len :in row-lengths
+      :if (< len max-length)
+        :collect (append row (make-list (- max-length len) :initial-element pad))
+      :else
+        :collect row)))
+
 (defun parse-string-into-array (data &key adjustable)
   "Parse DATA string into a 2-dimensional array."
   (let ((char-list (mapcar (alexandria:rcurry #'coerce 'list)
@@ -355,7 +376,7 @@ coordinates in the form (row, column). Otherwise, return NIL."
 			   (split-lines data))))
     (make-array (list (length char-list) (length (first char-list)))
 		:adjustable adjustable
-		:initial-contents char-list)))
+		:initial-contents (ensure-rectangular char-list :pad #\space))))
 
 (defun %array-loop (array dim indices item body)
   `(loop
@@ -762,10 +783,11 @@ bindings."
 
 (defparameter *problem-dir* "problem-data")
 
-(defun get-current-system-name ()
-  "Get the name of the ASDF system currently being loaded."
-  (let ((asd-path #p"*.asd"))
-    (pathname-name (first (directory asd-path)))))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+ (defun get-current-system-name ()
+   "Get the name of the ASDF system currently being loaded."
+   (pathname-name (first (or (directory #p"../*.asd")
+                             (directory #p"*.asd"))))))
 
 (defun get-problem-data (year day)
   (let ((path (asdf:system-relative-pathname

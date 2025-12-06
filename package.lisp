@@ -13,6 +13,7 @@
    :^3
    :aref*
    :array-loop
+   :array-transpose
    :bron-kerbosch
    :char-arr->num-arr
    :choose-combinations-not-replacing
@@ -35,6 +36,7 @@
    :parse-ranges
    :parse-string-into-array
    :parse-string-into-list
+   :parse-symbols
    :position-in-2d-array
    :split-lines
    :split-string-on-indices
@@ -428,6 +430,12 @@
   (:use #:cl #:util))
 
 (apply-local-nicknames '#:advent-of-code-2025.day05)
+
+(defpackage #:advent-of-code-2025.day06
+  (:nicknames #:aoc2025.day06)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2025.day06)
 
 (defpackage #:sudoku
   ;; (:nicknames #:aoc2022.day10)
