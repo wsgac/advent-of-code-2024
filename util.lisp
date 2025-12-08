@@ -612,7 +612,7 @@ values to `item`. For each such iteration execute `body`."
 ;;         (values cliques r p x))))
 
 ;; Borrowed from https://github.com/fcbr/graph-algorithms/blob/master/maximal-cliques.lisp
-(defun bron-kerbosch (R P X neighbors-fn visitor-fn)
+(defun bron-kerbosch (R P X neighbors-fn visitor-fn &key (test #'eql))
   "The basic form of the Bron–Kerbosch algorithm is a recursive
 backtracking algorithm that searches for all maximal cliques in a
 given graph G. More generally, given three disjoint sets of vertices
@@ -629,11 +629,11 @@ algorithm outputs R."
   (dolist (v P)
     (let ((nv (funcall neighbors-fn v)))
       (bron-kerbosch
-       (union R (list v))
-       (intersection P nv)
-       (intersection X nv)
-       neighbors-fn visitor-fn)
-      (a:removef P v)
+       (union R (list v) :test test)
+       (intersection P nv :test test)
+       (intersection X nv :test test)
+       neighbors-fn visitor-fn :test test)
+      (a:removef P v :test test)
       (push v X))))
 
 
