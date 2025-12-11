@@ -17,8 +17,25 @@
                :for p2 :in p1t
                :maximize (rectangle-area p1 p2))))
 
-(defun rectangle-in-grid? (p1 p2 grid)
-  nil)
+(defun find-concave (points)
+  "Find a")
+
+(trivia:defun-match* rectangle-in-grid? (p1 p2 grid)
+  (((list p1r p1c) (list p2r p2c) grid)
+   (labels ((between? (a x b)
+            (< (min a b) x (max a b)))
+            (non-corner? (q)
+              (destructuring-bind (qr qc) q
+               (or (and (= qr p1r) (between? p1c qc p2c))
+                   (and (= qr p2r) (between? p1c qc p2c))
+                   (and (= qc p1c) (between? p1r qr p2r))
+                   (and (= qc p2c) (between? p1r qr p2r)))))
+            (inside? (q)
+              (destructuring-bind (qr qc) q
+                (and (between? p1r qr p2r)
+                     (between? p1c qc p2c)))))
+     ;; (remove-if-not #'non-corner? grid)
+     (remove-if-not #'inside? grid))))
 
 (defun problem2 (&key (input *input-part-1-test*))
   (let ((grid (parse-input input)))

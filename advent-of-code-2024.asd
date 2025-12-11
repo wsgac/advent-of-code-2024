@@ -10,15 +10,16 @@
                :anaphora
                :array-operations
                :cl-ppcre
-               :lisp-stat
-               :lparallel
-               :local-time
-               :trivia
-               :sb-concurrency
-               :str
-               :serapeum
-               :zpng
                :fset
+               :linear-programming-glpk
+               :lisp-stat
+               :local-time
+               :lparallel
+               :sb-concurrency
+               :serapeum
+               :str
+               :trivia
+               :zpng
 	       )
   :components ((:file "package")
                (:file "onlisp")
@@ -33,6 +34,7 @@
                 :components
                 ((:file "a-star")
                  (:file "over-the-wire-natas")
+                 (:file "street-anagrams")
                  (:module "hdl"
                   :components
                   ((:file "hdl")))
@@ -105,4 +107,5 @@
                  (:file "day06")
                  (:file "day07")
                  (:file "day08")
-                 (:file "day09")))))
+                 (:file "day09")
+                 (:file "day10")))))

@@ -7,8 +7,7 @@
                     (#:lt #:local-time)
                     (#:re #:cl-ppcre))
   (:export
-   :2d-array->png
-   :2d-array->string
+      :2d-array->string
    :^2
    :^3
    :aref*
@@ -31,6 +30,7 @@
    :list->groups
    :manhattan
    :merge-plists
+   :notf
    :number->digits
    :parse-integers
    :parse-ranges
@@ -41,10 +41,11 @@
    :split-lines
    :split-string-on-indices
    :square
+   :transpose
    :vec+
    :vector-push-n
    :within-array
-   :transpose
+:2d-array->png
    ;; Priority Queue
    :character-list
    :file-at-once
@@ -455,6 +456,12 @@
 
 (apply-local-nicknames '#:advent-of-code-2025.day09)
 
+(defpackage #:advent-of-code-2025.day10
+  (:nicknames #:aoc2025.day10)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2025.day10)
+
 (defpackage #:sudoku
   ;; (:nicknames #:aoc2022.day10)
   (:use #:cl #:util))
@@ -465,6 +472,11 @@
   (:use #:cl))
 
 (apply-local-nicknames '#:m3u-downloader)
+
+(defpackage #:explorations.street-anagrams
+  (:use #:cl))
+
+(apply-local-nicknames '#:explorations.street-anagrams)
 
 (defpackage #:hdl
   (:use #:cl)

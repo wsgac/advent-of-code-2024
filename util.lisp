@@ -173,6 +173,12 @@ chosen elements. This should produce $|set|^k$ items."
 (defun parse-symbols (string)
   (mapcar #'find-symbol (str:split-omit-nulls " " string)))
 
+;;;;;;;;;;;
+;; Logic ;;
+;;;;;;;;;;;
+
+(define-modify-macro notf () not)
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Digits & Numbers ;;
 ;;;;;;;;;;;;;;;;;;;;;;
