@@ -807,19 +807,21 @@ bindings."
     (string-trim '(#\space #\newline) (uiop:read-file-string path))))
 
 (defun fetch-problem-data (year day)
-  (let* ((url (format nil "https://adventofcode.com/~d/day/~d/input"
-                      year day))
-         (cookie-path (asdf:system-relative-pathname
-                       (get-current-system-name)
-                       (format nil "~a/cookie" *problem-dir*)))
-         (cookie (restart-case (uiop:read-file-string cookie-path)
-                   (use-cookie (new-cookie)
-                     :report "Enter cookie string manually"
-                     :interactive (lambda ()
-                                    (princ "Cookie: " *query-io*)
-                                    (list (read-line *query-io*)))
-                     (uiop:with-output-file (s cookie-path
-                                               :if-does-not-exist :create)
-                       (princ new-cookie s)
-                       new-cookie)))))
-    (dex:get url :headers `(("Cookie" . ,cookie)) :want-stream t)))
+  (let ((url (format nil "https://adventofcode.com/~d/day/~d/input"
+                     year day))
+        (cookie-path (asdf:system-relative-pathname
+                      (get-current-system-name)
+                      (format nil "~a/cookie" *problem-dir*))))
+    (restart-case
+        (let* ((cookie (uiop:read-file-string cookie-path)))
+          (dex:get url :headers `(("Cookie" . ,cookie)) :want-stream t))
+      (use-cookie (new-cookie)
+        :report "Enter cookie string manually"
+        :interactive (lambda ()
+                       (princ "Cookie: " *query-io*)
+                       (list (read-line *query-io*)))
+        (uiop:with-output-file (s cookie-path
+                                  :if-does-not-exist :create
+                                  :if-exists :supersede)
+          (princ new-cookie s)
+          new-cookie)))))
