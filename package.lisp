@@ -491,11 +491,6 @@
 
 (apply-local-nicknames '#:m3u-downloader)
 
-(defpackage #:explorations.street-anagrams
-  (:use #:cl))
-
-(apply-local-nicknames '#:explorations.street-anagrams)
-
 (defpackage #:explorations.yiddish
   (:use #:cl))
 

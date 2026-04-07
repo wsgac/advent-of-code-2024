@@ -35,7 +35,6 @@
                 :components
                 ((:file "a-star")
                  (:file "over-the-wire-natas")
-                 (:file "street-anagrams")
                  (:module "hdl"
                   :components
                   ((:file "hdl")))
