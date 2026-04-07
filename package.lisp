@@ -400,6 +400,12 @@
 
 (apply-local-nicknames '#:advent-of-code-2022.day15)
 
+(defpackage #:advent-of-code-2022.day16
+  (:nicknames #:aoc2022.day16)
+  (:use #:cl #:util))
+
+(apply-local-nicknames '#:advent-of-code-2022.day16)
+
 ;; 2025
 
 (defpackage #:advent-of-code-2025.day01
@@ -489,6 +495,16 @@
   (:use #:cl))
 
 (apply-local-nicknames '#:explorations.street-anagrams)
+
+(defpackage #:explorations.yiddish
+  (:use #:cl))
+
+(apply-local-nicknames '#:explorations.yiddish)
+
+(defpackage #:soviet-programming-olympiad
+  (:use #:cl))
+
+(apply-local-nicknames '#:soviet-programming-olympiad)
 
 (defpackage #:hdl
   (:use #:cl)

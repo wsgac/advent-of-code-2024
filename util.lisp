@@ -792,8 +792,11 @@ bindings."
 (eval-when (:compile-toplevel :load-toplevel :execute)
  (defun get-current-system-name ()
    "Get the name of the ASDF system currently being loaded."
-   (pathname-name (first (or (directory #p"../*.asd")
-                             (directory #p"*.asd"))))))
+   (or (pathname-name (first (or (directory #p"../*.asd")
+                                 (directory #p"*.asd"))))
+       "advent-of-code-2024"
+       ;; Hard-coded fallback just in case
+       )))
 
 (defun get-problem-data (year day)
   (let ((path (asdf:system-relative-pathname

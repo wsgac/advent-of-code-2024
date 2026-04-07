@@ -39,7 +39,9 @@
                  (:module "hdl"
                   :components
                   ((:file "hdl")))
-                 (:file "m3u-downloader")))
+                 (:file "m3u-downloader")
+                 (:file "yiddish")
+                 (:file "soviet-programming-olympiad")))
                ;; AoC 2022 recap
                (:module "2022"
                 :components
@@ -57,7 +59,8 @@
                  (:file "day12")
                  (:file "day13")
                  (:file "day14")
-                 (:file "day15")))
+                 (:file "day15")
+                 (:file "day16")))
                ;; AoC 2023 recap
                (:module "2023"
                 :components
