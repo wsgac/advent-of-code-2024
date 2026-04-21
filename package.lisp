@@ -26,6 +26,7 @@
    :factors
    :get-problem-data
    :histogram
+   :interleave-functions
    :join-numbers
    :list->groups
    :manhattan

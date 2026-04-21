@@ -170,6 +170,15 @@ chosen elements. This should produce $|set|^k$ items."
 #+(or)
 (choose-combinations-replacing '(a b c d e) 3)
 
+(defun interleave-functions (functions arguments)
+  (labels ((interleave (fun arg acc)
+             (if (and fun arg)
+                 (interleave (rest fun)
+                             (rest arg)
+                             (funcall (first fun) acc (first arg)))
+                 acc)))
+    (interleave functions (rest arguments) (first arguments))))
+
 (defun parse-symbols (string)
   (mapcar #'find-symbol (str:split-omit-nulls " " string)))
 
