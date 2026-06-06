@@ -40,7 +40,8 @@
                   ((:file "hdl")))
                  (:file "m3u-downloader")
                  (:file "yiddish")
-                 (:file "soviet-programming-olympiad")))
+                 (:file "soviet-programming-olympiad")
+                 (:file "photo-name-normalizer")))
                ;; AoC 2022 recap
                (:module "2022"
                 :components

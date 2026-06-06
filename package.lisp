@@ -502,6 +502,11 @@
 
 (apply-local-nicknames '#:soviet-programming-olympiad)
 
+(defpackage #:photo-name-normalizer
+  (:use #:cl))
+
+(apply-local-nicknames '#:photo-name-normalizer)
+
 (defpackage #:hdl
   (:use #:cl)
   (:local-nicknames (#:a #:alexandria)
