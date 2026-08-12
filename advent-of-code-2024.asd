@@ -41,7 +41,8 @@
                  (:file "m3u-downloader")
                  (:file "yiddish")
                  (:file "soviet-programming-olympiad")
-                 (:file "photo-name-normalizer")))
+                 (:file "photo-name-normalizer")
+                 (:file "monadic-parser-combinators")))
                ;; AoC 2022 recap
                (:module "2022"
                 :components

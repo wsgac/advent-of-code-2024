@@ -507,6 +507,11 @@
 
 (apply-local-nicknames '#:photo-name-normalizer)
 
+(defpackage #:monadic-parser-combinators
+  (:use #:cl))
+
+(apply-local-nicknames '#:monadic-parser-combinators)
+
 (defpackage #:hdl
   (:use #:cl)
   (:local-nicknames (#:a #:alexandria)
