@@ -31,6 +31,9 @@
                 ((:file "sudoku")
                  (:file "misc")
                  (:file "sicp")))
+               (:module "over-the-wire"
+                :components
+                ((:file "krypton-util")))
                (:module "explorations"
                 :components
                 ((:file "a-star")

@@ -512,6 +512,13 @@
 
 (apply-local-nicknames '#:monadic-parser-combinators)
 
+(defpackage #:over-the-wire.krypton
+  (:nicknames #:krypton)
+  (:use #:cl))
+
+(apply-local-nicknames '#:over-the-wire.krypton)
+
+
 (defpackage #:hdl
   (:use #:cl)
   (:local-nicknames (#:a #:alexandria)
