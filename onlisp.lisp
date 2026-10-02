@@ -50,6 +50,23 @@
                                 `(nthcdr ,n ,src))
                             (1- (length parms))))))))
 
+;; WSG: Another take on DO-TUPLES/O
+#+(or)
+(defun %n-tails (n list)
+  (loop
+    :repeat n
+    :for l := list :then `(rest ,l)
+    :collect l))
+
+#+(or)
+(defmacro do-tuples/o (params source &body body)
+  (when params
+    (let ((src (gensym)))
+      `(prog ((,src ,source))
+          (mapc (lambda ,params ,@body)
+                ,@(%n-tails (length params)
+                           src))))))
+
 ;; WSG: Simplified implementation
 (defmacro do-tuples/c (parms source &body body)
   (if parms
@@ -136,6 +153,9 @@ and, appending any remaining elements to the end."
                   (first l2)
                   (shuffle (rest l1)
                            (rest l2))))))
+
+#+(or)
+(shuffle '(a b c) '(1 2 3 4))
 
 (defun group (list n)
   "Group `list` into groups of (at most) `n` elements. The last group is
